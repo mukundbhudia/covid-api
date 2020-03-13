@@ -2,22 +2,26 @@ import express from 'express'
 import graphqlHTTP from 'express-graphql'
 import { buildSchema } from 'graphql'
 
+import { getGis } from '../services/gis'
+
 const PORT = 4000
 
 // Construct a schema, using GraphQL schema language
 const schema = buildSchema(`
-  type CasesByCountry {
-    active: Int!
+  type CasesByLocation {
+    active: Int
     confirmed: Int!
+    country: String!
     deaths: Int!
-    recovered: Int!
     latitude: String!
     longitude: String!
+    province: String
+    recovered: Int!
   }
 
   type Query {
     hello: String
-    casesByCountry: CasesByCountry
+    casesByLocation: [CasesByLocation]
   }
 `)
 
@@ -26,15 +30,19 @@ const root = {
   hello: () => {
     return 'Hello world!'
   },
-  casesByCountry: () => {
-    return {
-      active: 0,
-      confirmed: 0,
-      deaths: 0,
-      recovered: 0,
-      latitude: "0",
-      longitude: "0",
-    }
+  casesByLocation: async () => {
+    const { data } = await getGis()
+    const cases = data.features.map(({ attributes }) => ({
+      active: attributes.Active,
+      confirmed: attributes.Confirmed,
+      country: attributes.Country_Region,
+      deaths: attributes.Deaths,
+      latitude: attributes.Lat,
+      longitude: attributes.Long_,
+      province: attributes.Province_State,
+      recovered: attributes.Recovered
+    }))
+    return cases
   }
 }
 

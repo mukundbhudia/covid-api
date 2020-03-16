@@ -2,7 +2,7 @@ import express from 'express'
 import graphqlHTTP from 'express-graphql'
 import { buildSchema } from 'graphql'
 
-import { getGis } from '../services/gis'
+import { getGisCasesByCountry } from '../services/gis'
 
 const PORT = 4000
 
@@ -31,7 +31,7 @@ const root = {
     return 'Hello world!'
   },
   casesByLocation: async () => {
-    const { data } = await getGis()
+    const { data } = await getGisCasesByCountry()
     const cases = data.features.map(({ attributes }) => ({
       active: attributes.Active,
       confirmed: attributes.Confirmed,

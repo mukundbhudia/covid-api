@@ -2,7 +2,7 @@ import express from 'express'
 import graphqlHTTP from 'express-graphql'
 import { buildSchema } from 'graphql'
 
-import { getGisCasesByCountry } from '../services/gis'
+import { getGisCasesByCountry, getGisTotalConfirmed, getGisTotalRecovered, getGisTotalDeaths } from '../services/gis'
 
 const PORT = 4000
 
@@ -21,6 +21,9 @@ const schema = buildSchema(`
 
   type Query {
     hello: String
+    totalConfirmed: Int
+    totalRecovered: Int
+    totalDeaths: Int
     casesByLocation: [CasesByLocation]
   }
 `)
@@ -43,7 +46,19 @@ const root = {
       recovered: attributes.Recovered
     }))
     return cases
-  }
+  },
+  totalConfirmed: async () => {
+    const { data } = await getGisTotalConfirmed()
+    return data.features[0].attributes.value
+  },
+  totalRecovered: async () => {
+    const { data } = await getGisTotalRecovered()
+    return data.features[0].attributes.value
+  },
+  totalDeaths: async () => {
+    const { data } = await getGisTotalDeaths()
+    return data.features[0].attributes.value
+  },
 }
 
 const app = express()

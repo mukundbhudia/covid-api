@@ -1,6 +1,7 @@
 import express from 'express'
 import graphqlHTTP from 'express-graphql'
 import { buildSchema } from 'graphql'
+import { config as envConfig } from 'dotenv'
 
 import { getGisCasesByCountry, getGisTotalConfirmed, getGisTotalRecovered, getGisTotalDeaths } from '../services/gis'
 
@@ -60,6 +61,8 @@ const root = {
     return data.features[0].attributes.value
   },
 }
+
+envConfig()
 
 const app = express()
 app.use('/graphql', graphqlHTTP({

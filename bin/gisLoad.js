@@ -1,13 +1,29 @@
 #!/usr/bin/env node
 
 const { connectDB, getDBClient, getClient, disconnectDB } = require('../src/dbClient')
+const processing = require('../src/services/csvProcessing')
 const {
   getGisCasesByCountry,
   getGisTotalConfirmed,
   getGisTotalRecovered,
   getGisTotalDeaths
 } = require('../src/services/gis')
+
+const {
+  getGhTimeSeriesConfirmed,
+  getGhTimeSeriesRecovered,
+  getGhTimeSeriesDeaths
+} = require('../src/services/gitHub')
+
 require('dotenv').config()
+
+const timeSeriesData = async () => {
+  const confirmedCases = await getGhTimeSeriesConfirmed()
+  const recoveredCases = await getGhTimeSeriesRecovered()
+  const deathCases = await getGhTimeSeriesDeaths()
+  const result = processing.combineDataFromSources(confirmedCases.data, recoveredCases.data, deathCases.data)
+  return result
+}
 
 const casesByLocation = async () => {
   const { data } = await getGisCasesByCountry()
@@ -53,18 +69,36 @@ const replaceGis = async () => {
   }
 
   const cases = await casesByLocation()
+  const timeSeriesCases = await timeSeriesData()
 
   if (cases.length > 0 &&
     allTotals.totalConfirmed > 0 &&
     allTotals.totalRecovered > 0 &&
     allTotals.totalDeaths > 0
   ) {
+    let combinedCountryCasesWithTimeSeries = []
+
+    timeSeriesCases.collection.forEach((ghCase) => {
+      cases.forEach((gisCase) => {
+        if (gisCase.country === ghCase.countryRegion) {
+          if ((gisCase.province === ghCase.provinceState) || (gisCase.province === null && ghCase.provinceState === '')) {
+            gisCase.casesByDate = ghCase.casesByDate
+            combinedCountryCasesWithTimeSeries.push(gisCase)
+          }
+        }
+      })
+    })
+    console.log(`Countries/Regions total: ${combinedCountryCasesWithTimeSeries.length} from ${cases.length} GIS cases and ${timeSeriesCases.collection.length} GH cases`)
+
     await session.withTransaction(async () => {
       await dbClient.collection('totals').deleteMany({})
       await dbClient.collection('totals').insertOne(allTotals)
 
       await dbClient.collection('casesByLocation').deleteMany({})
-      await dbClient.collection('casesByLocation').insertOne( { casesByLocation: cases } )
+      await dbClient.collection('casesByLocation').insertOne( { casesByLocation: combinedCountryCasesWithTimeSeries } )
+
+      // await dbClient.collection('timeSeriescasesByLocation').deleteMany({})
+      // await dbClient.collection('timeSeriescasesByLocation').insertOne( { timeSeriescasesByLocation: timeSeriesCases.collection } )
     })
   }
 
@@ -74,7 +108,7 @@ const replaceGis = async () => {
 
 const fetchAndReplace = () => {
   try {
-    console.log("Fetching GIS service...")
+    console.log("Fetching services...")
     replaceGis()
   } catch (err) {
     console.error(err)

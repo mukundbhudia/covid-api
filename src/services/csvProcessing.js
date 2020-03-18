@@ -8,6 +8,7 @@ const processCsvFromSources = (csv_confirmedCases, csv_recoveredCases, csv_death
     recovered: 0,
     deaths: 0,
     active: 0,
+    globalCasesByDate: {},
   }
 
   for (let i = 0; i < csv_confirmedCases.length; i++) {
@@ -45,14 +46,32 @@ const processCsvFromSources = (csv_confirmedCases, csv_recoveredCases, csv_death
           badRows++
           console.error(`${countryRegion} in ${provinceState} is bad`)
         }
-
-        processedData.casesByDate[key] = { 
+        
+        const casesTotalPerDay  = { 
           confirmed: parsedConfirmed,
           recovered: parsedRecovered,
           deaths: parsedDeaths,
           active: parsedActive,
         }
-        
+
+        processedData.casesByDate[key] = casesTotalPerDay
+
+        if (
+          stats.globalCasesByDate[key]
+        ) {
+          stats.globalCasesByDate[key].confirmed += parsedConfirmed
+          stats.globalCasesByDate[key].recovered += parsedRecovered
+          stats.globalCasesByDate[key].deaths += parsedDeaths
+          stats.globalCasesByDate[key].active += parsedActive
+        } else {
+          stats.globalCasesByDate[key] = { 
+            confirmed: 0,
+            recovered: 0,
+            deaths: 0,
+            active: 0,
+          }        
+        }
+
         if (j + 1 === rowKeys.length) {
           stats.confirmed += parsedConfirmed
           stats.recovered += parsedRecovered

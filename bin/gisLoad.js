@@ -61,15 +61,16 @@ const replaceGis = async () => {
   const dbClient = getDBClient()
   const session = getClient().startSession()
 
+  const cases = await casesByLocation()
+  const timeSeriesCases = await timeSeriesData()
+  
   const allTotals = {
     totalConfirmed: await totalConfirmed(),
     totalRecovered: await totalRecovered(),
     totalDeaths: await totalDeaths(),
+    timeSeriesTotalCasesByDate: timeSeriesCases.stats.globalCasesByDate,
     timeStamp: new Date(),
   }
-
-  const cases = await casesByLocation()
-  const timeSeriesCases = await timeSeriesData()
 
   if (cases.length > 0 &&
     allTotals.totalConfirmed > 0 &&
@@ -88,7 +89,7 @@ const replaceGis = async () => {
         }
       })
     })
-    console.log(`Countries/Regions total: ${combinedCountryCasesWithTimeSeries.length} from ${cases.length} GIS cases and ${timeSeriesCases.collection.length} GH cases`)
+    console.log(`Countries/Regions total: ${combinedCountryCasesWithTimeSeries.length}. (From ${cases.length} GIS cases and ${timeSeriesCases.collection.length} GH cases)`)
 
     await session.withTransaction(async () => {
       await dbClient.collection('totals').deleteMany({})
@@ -96,9 +97,6 @@ const replaceGis = async () => {
 
       await dbClient.collection('casesByLocation').deleteMany({})
       await dbClient.collection('casesByLocation').insertOne( { casesByLocation: combinedCountryCasesWithTimeSeries } )
-
-      // await dbClient.collection('timeSeriescasesByLocation').deleteMany({})
-      // await dbClient.collection('timeSeriescasesByLocation').insertOne( { timeSeriescasesByLocation: timeSeriesCases.collection } )
     })
   }
 

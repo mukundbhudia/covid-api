@@ -64,10 +64,15 @@ const replaceGis = async () => {
   const cases = await casesByLocation()
   const timeSeriesCases = await timeSeriesData()
   
+  const confirmed = await totalConfirmed()
+  const recovered = await totalRecovered()
+  const deaths = await totalDeaths()
+
   const allTotals = {
-    totalConfirmed: await totalConfirmed(),
-    totalRecovered: await totalRecovered(),
-    totalDeaths: await totalDeaths(),
+    totalConfirmed: confirmed,
+    totalRecovered: recovered,
+    totalDeaths: deaths,
+    totalActive : confirmed - (recovered + deaths),
     timeSeriesTotalCasesByDate: timeSeriesCases.stats.globalCasesByDate,
     timeStamp: new Date(),
   }
@@ -96,7 +101,7 @@ const replaceGis = async () => {
       await dbClient.collection('totals').insertOne(allTotals)
 
       await dbClient.collection('casesByLocation').deleteMany({})
-      await dbClient.collection('casesByLocation').insertOne( { casesByLocation: combinedCountryCasesWithTimeSeries } )
+      await dbClient.collection('casesByLocation').insertMany(combinedCountryCasesWithTimeSeries)
     })
   }
 

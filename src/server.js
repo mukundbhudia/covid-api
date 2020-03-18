@@ -41,17 +41,31 @@ const schema = buildSchema(`
     totalConfirmed: Int!
     totalRecovered: Int!
     totalDeaths: Int!
+    totalActive: Int!
+  }
+
+  type TimeSeries {
+    date: String!
+    cases: TotalCases!
   }
 
   type Query {
     totalCases: TotalCases
     casesByLocation: [CasesByLocation]
     lastUpdated: String!
+    globalTimeSeries: TimeSeries
   }
 `)
 
 // The root provides a resolver function for each API endpoint
 const root = {
+  globalTimeSeries: async () => {
+    await connectDB()
+    const dbClient = getDBClient()
+    const { timeSeriesTotalCasesByDate } = await dbClient.collection('totals').findOne()
+    // console.log(timeSeriesTotalCasesByDate);
+    return timeSeriesTotalCasesByDate
+  },
   lastUpdated: async () => {
     await connectDB()
     const dbClient = getDBClient()
@@ -61,8 +75,8 @@ const root = {
   casesByLocation: async () => {
     await connectDB()
     const dbClient = getDBClient()
-    const { casesByLocation } = await dbClient.collection('casesByLocation').findOne()
-    return casesByLocation
+    const cursor = await dbClient.collection('casesByLocation').find({})
+    return await cursor.toArray()
   },
   totalCases: async () => {
     await connectDB()

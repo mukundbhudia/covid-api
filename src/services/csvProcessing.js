@@ -28,7 +28,7 @@ const processCsvFromSources = (csv_confirmedCases, csv_recoveredCases, csv_death
       provinceState: provinceState,
       latitude: latitude,
       longitude: longtitude,
-      casesByDate: {}
+      casesByDate: []
     }
 
     let j = 0
@@ -52,9 +52,10 @@ const processCsvFromSources = (csv_confirmedCases, csv_recoveredCases, csv_death
           recovered: parsedRecovered,
           deaths: parsedDeaths,
           active: parsedActive,
+          day: key
         }
 
-        processedData.casesByDate[key] = casesTotalPerDay
+        processedData.casesByDate.push(casesTotalPerDay)
 
         if (
           stats.globalCasesByDate[key]

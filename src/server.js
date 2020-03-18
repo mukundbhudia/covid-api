@@ -35,25 +35,22 @@ const schema = buildSchema(`
     objectId: Int!
     province: String
     recovered: Int!
+    casesByDate: [Cases]
   }
 
-  type TotalCases {
-    totalConfirmed: Int!
-    totalRecovered: Int!
-    totalDeaths: Int!
-    totalActive: Int!
-  }
-
-  type TimeSeries {
-    date: String!
-    cases: TotalCases!
+  type Cases {
+    confirmed: Int!
+    recovered: Int!
+    deaths: Int!
+    active: Int!
+    day: String
   }
 
   type Query {
-    totalCases: TotalCases
+    totalCases: Cases
     casesByLocation: [CasesByLocation]
     lastUpdated: String!
-    globalTimeSeries: TimeSeries
+    globalTimeSeries: [Cases]
   }
 `)
 
@@ -63,7 +60,6 @@ const root = {
     await connectDB()
     const dbClient = getDBClient()
     const { timeSeriesTotalCasesByDate } = await dbClient.collection('totals').findOne()
-    // console.log(timeSeriesTotalCasesByDate);
     return timeSeriesTotalCasesByDate
   },
   lastUpdated: async () => {

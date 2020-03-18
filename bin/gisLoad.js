@@ -72,8 +72,15 @@ const replaceGis = async () => {
   await disconnectDB()
 }
 
-try {
-  replaceGis()
-} catch (err) {
-  console.error(err)
+const fetchAndReplace = () => {
+  try {
+    console.log("Fetching GIS service...")
+    replaceGis()
+  } catch (err) {
+    console.error(err)
+  } 
+}
+
+module.exports = {
+  fetchAndReplace: fetchAndReplace
 }

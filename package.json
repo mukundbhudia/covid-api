@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx babel-node src/server.js",
-    "server": "npx nodemon src/server.js --exec babel-node --presets babel-preset-env",
+    "start": "npx nodemon src/server.js --exec babel-node --presets babel-preset-env",
+    "server": "npx babel-node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

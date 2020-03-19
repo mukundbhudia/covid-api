@@ -49,6 +49,8 @@ const schema = buildSchema(`
   type Query {
     totalCases: Cases
     casesByLocation: [CasesByLocation]
+    getCasesWithCountry(country: String!): [CasesByLocation]
+    getCasesWithCountryAndProvince(country: String!, province: String!): [CasesByLocation]
     lastUpdated: String!
     globalTimeSeries: [Cases]
   }
@@ -61,6 +63,25 @@ const root = {
     const dbClient = getDBClient()
     const { timeSeriesTotalCasesByDate } = await dbClient.collection('totals').findOne()
     return timeSeriesTotalCasesByDate
+  },
+  getCasesWithCountry: async (args) => {
+    if (args && args.country) {
+      await connectDB()
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({country: args.country})
+      return await cursor.toArray()
+    }
+  },
+  getCasesWithCountryAndProvince: async (args) => {
+    if (args && args.country && args.province) {
+      await connectDB()
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({
+          country: args.country,
+          province: args.province
+      })
+      return await cursor.toArray()
+    }
   },
   lastUpdated: async () => {
     await connectDB()

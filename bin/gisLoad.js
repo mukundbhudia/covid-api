@@ -79,7 +79,8 @@ const replaceGis = async () => {
     confirmed: confirmed,
     recovered: recovered,
     deaths: deaths,
-    active : confirmed - (recovered + deaths),
+    active: confirmed - (recovered + deaths),
+    allCountries: [],
     timeSeriesTotalCasesByDate: timeSeriesCases.stats.globalCasesByDate,
     timeStamp: new Date(),
   }
@@ -90,17 +91,47 @@ const replaceGis = async () => {
     allTotals.deaths > 0
   ) {
     let combinedCountryCasesWithTimeSeries = []
+    let countryFoundMap = {}
 
     timeSeriesCases.collection.forEach((ghCase) => {
       cases.forEach((gisCase) => {
         if (gisCase.country === ghCase.countryRegion) {
           if ((gisCase.province === ghCase.provinceState) || (gisCase.province === null && ghCase.provinceState === '')) {
+            if (countryFoundMap[gisCase.country]) { // More than one country so it'll have many provinces/regions
+              countryFoundMap[gisCase.country].provincesCount += 1
+              countryFoundMap[gisCase.country].confirmed += gisCase.confirmed
+              countryFoundMap[gisCase.country].active += gisCase.active
+              countryFoundMap[gisCase.country].recovered += gisCase.recovered
+              countryFoundMap[gisCase.country].deaths += gisCase.deaths
+            } else {
+              countryFoundMap[gisCase.country] = {
+                provincesCount: 0,
+                active: gisCase.active,
+                confirmed: gisCase.confirmed,
+                country: gisCase.country,
+                deaths: gisCase.deaths,
+                lastUpdate: gisCase.lastUpdate,
+                latitude: gisCase.latitude,
+                longitude: gisCase.longitude,
+                province: null,
+                recovered: gisCase.recovered
+              }
+            }
             gisCase.casesByDate = ghCase.casesByDate
             combinedCountryCasesWithTimeSeries.push(gisCase)
           }
         }
       })
     })
+    const allCountriesFound = Object.keys(countryFoundMap)
+    allTotals.allCountries = allCountriesFound
+    allCountriesFound.forEach((countryName) => {
+      let countryWithProvince = countryFoundMap[countryName]
+      if (countryWithProvince.provincesCount > 0) {
+        combinedCountryCasesWithTimeSeries.push(countryWithProvince)
+      }
+    })
+
     console.log(`Countries/Regions total: ${combinedCountryCasesWithTimeSeries.length}. (From ${cases.length} GIS cases and ${timeSeriesCases.collection.length} GH cases) at ${(new Date()).toLocaleString()}`)
 
     await session.withTransaction(async () => {
@@ -109,6 +140,7 @@ const replaceGis = async () => {
 
       await dbClient.collection('casesByLocation').deleteMany({})
       await dbClient.collection('casesByLocation').insertMany(combinedCountryCasesWithTimeSeries)
+      console.log("Saved to database...")
     })
   }
 

@@ -101,7 +101,7 @@ const replaceGis = async () => {
         }
       })
     })
-    console.log(`Countries/Regions total: ${combinedCountryCasesWithTimeSeries.length}. (From ${cases.length} GIS cases and ${timeSeriesCases.collection.length} GH cases)`)
+    console.log(`Countries/Regions total: ${combinedCountryCasesWithTimeSeries.length}. (From ${cases.length} GIS cases and ${timeSeriesCases.collection.length} GH cases) at ${(new Date()).toLocaleString()}`)
 
     await session.withTransaction(async () => {
       await dbClient.collection('totals').deleteMany({})

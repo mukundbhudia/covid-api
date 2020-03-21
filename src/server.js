@@ -12,8 +12,8 @@ const PORT = 4000
 const SERVICE_FETCH_INTERVAL_IN_MINS = 15
 
 // Initial load
-gisLoad.fetchAndReplace()
-connectDB()
+// gisLoad.fetchAndReplace()
+
 setInterval(() => {
   try {
     gisLoad.fetchAndReplace()
@@ -138,11 +138,16 @@ const root = {
 }
 
 const app = express()
-app.use(cors())
-app.use('/graphql', graphqlHTTP({
-  schema: schema,
-  rootValue: root,
-  graphiql: true,
-}))
-app.listen(PORT)
-console.log(`Running a GraphQL API server at http://localhost:${PORT}/graphql`)
+const startServer = async () => {
+  await connectDB()
+  app.use(cors())
+  app.use('/graphql', graphqlHTTP({
+    schema: schema,
+    rootValue: root,
+    graphiql: true,
+  }))
+  app.listen(PORT)
+  console.log(`Running a GraphQL API server at http://localhost:${PORT}/graphql`)
+}
+
+startServer()

@@ -51,6 +51,10 @@ const schema = buildSchema(`
     casesByLocation: [CasesByLocation]
     getCasesWithCountry(country: String!): [CasesByLocation]
     getCasesWithCountryAndProvince(country: String!, province: String!): [CasesByLocation]
+    topXconfirmedByCountry(limit: Int!): [CasesByLocation]
+    topXactiveByCountry(limit: Int!): [CasesByLocation]
+    topXrecoveredByCountry(limit: Int!): [CasesByLocation]
+    topXdeathsByCountry(limit: Int!): [CasesByLocation]
     lastUpdated: String!
     globalTimeSeries: [Cases]
     getAllCountries: [String]
@@ -90,6 +94,38 @@ const root = {
         country: args.country,
         province: args.province
       })
+      return await cursor.toArray()
+    }
+  },
+  topXconfirmedByCountry: async (args) => {
+    if (args && args.limit) {
+      await connectDB()
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'confirmed': -1}).limit(args.limit)
+      return await cursor.toArray()
+    }
+  },
+  topXactiveByCountry: async (args) => {
+    if (args && args.limit) {
+      await connectDB()
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'active': -1}).limit(args.limit)
+      return await cursor.toArray()
+    }
+  },
+  topXrecoveredByCountry: async (args) => {
+    if (args && args.limit) {
+      await connectDB()
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'recovered': -1}).limit(args.limit)
+      return await cursor.toArray()
+    }
+  },
+  topXdeathsByCountry: async (args) => {
+    if (args && args.limit) {
+      await connectDB()
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'deaths': -1}).limit(args.limit)
       return await cursor.toArray()
     }
   },

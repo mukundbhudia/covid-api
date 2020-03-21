@@ -7,7 +7,7 @@ const { connectDB, getDBClient, disconnectDB } = require('../src/dbClient')
 
 require('dotenv').config()
 
-const PORT = 4000
+const PORT = process.env.PORT || 4000
 
 // Construct a schema, using GraphQL schema language
 const schema = buildSchema(`

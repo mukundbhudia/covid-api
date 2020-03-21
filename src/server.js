@@ -13,7 +13,7 @@ const SERVICE_FETCH_INTERVAL_IN_MINS = 15
 
 // Initial load
 gisLoad.fetchAndReplace()
-
+connectDB()
 setInterval(() => {
   try {
     gisLoad.fetchAndReplace()
@@ -64,20 +64,17 @@ const schema = buildSchema(`
 // The root provides a resolver function for each API endpoint
 const root = {
   globalTimeSeries: async () => {
-    await connectDB()
     const dbClient = getDBClient()
     const { timeSeriesTotalCasesByDate } = await dbClient.collection('totals').findOne()
     return timeSeriesTotalCasesByDate
   },
   getAllCountries: async () => {
-    await connectDB()
     const dbClient = getDBClient()
     const { allCountries } = await dbClient.collection('totals').findOne()
     return allCountries
   },
   getCasesWithCountry: async (args) => {
     if (args && args.country) {
-      await connectDB()
       const dbClient = getDBClient()
       const cursor = await dbClient.collection('casesByLocation').find({country: args.country})
       return await cursor.toArray()
@@ -88,7 +85,6 @@ const root = {
       if (args.province === '') {
         args.province = null
       }
-      await connectDB()
       const dbClient = getDBClient()
       const cursor = await dbClient.collection('casesByLocation').find({
         country: args.country,
@@ -99,7 +95,6 @@ const root = {
   },
   topXconfirmedByCountry: async (args) => {
     if (args && args.limit) {
-      await connectDB()
       const dbClient = getDBClient()
       const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'confirmed': -1}).limit(args.limit)
       return await cursor.toArray()
@@ -107,7 +102,6 @@ const root = {
   },
   topXactiveByCountry: async (args) => {
     if (args && args.limit) {
-      await connectDB()
       const dbClient = getDBClient()
       const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'active': -1}).limit(args.limit)
       return await cursor.toArray()
@@ -115,7 +109,6 @@ const root = {
   },
   topXrecoveredByCountry: async (args) => {
     if (args && args.limit) {
-      await connectDB()
       const dbClient = getDBClient()
       const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'recovered': -1}).limit(args.limit)
       return await cursor.toArray()
@@ -123,26 +116,22 @@ const root = {
   },
   topXdeathsByCountry: async (args) => {
     if (args && args.limit) {
-      await connectDB()
       const dbClient = getDBClient()
       const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'deaths': -1}).limit(args.limit)
       return await cursor.toArray()
     }
   },
   lastUpdated: async () => {
-    await connectDB()
     const dbClient = getDBClient()
     const { timeStamp } = await dbClient.collection('totals').findOne()
     return timeStamp
   },
   casesByLocation: async () => {
-    await connectDB()
     const dbClient = getDBClient()
     const cursor = await dbClient.collection('casesByLocation').find({})
     return await cursor.toArray()
   },
   totalCases: async () => {
-    await connectDB()
     const dbClient = getDBClient()
     return await dbClient.collection('totals').findOne()
   },

@@ -2,25 +2,12 @@ import express from 'express'
 import graphqlHTTP from 'express-graphql'
 import { buildSchema } from 'graphql'
 import cors from 'cors'
-import gisLoad from '../bin/gisLoad'
 
 const { connectDB, getDBClient, disconnectDB } = require('../src/dbClient')
 
 require('dotenv').config()
 
 const PORT = 4000
-const SERVICE_FETCH_INTERVAL_IN_MINS = 15
-
-// Initial load
-// gisLoad.fetchAndReplace()
-
-setInterval(() => {
-  try {
-    gisLoad.fetchAndReplace()
-  } catch (err) {
-    console.error(err)
-  }
-}, 1000 * 60 * SERVICE_FETCH_INTERVAL_IN_MINS)
 
 // Construct a schema, using GraphQL schema language
 const schema = buildSchema(`

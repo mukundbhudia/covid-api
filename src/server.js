@@ -1,7 +1,7 @@
-import express from 'express'
-import graphqlHTTP from 'express-graphql'
-import { buildSchema } from 'graphql'
-import cors from 'cors'
+const express = require('express')
+const graphqlHTTP = require('express-graphql')
+const { buildSchema } = require('graphql')
+const cors = require('cors')
 
 const { connectDB, getDBClient, disconnectDB } = require('../src/dbClient')
 

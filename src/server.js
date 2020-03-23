@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 4000
 // Construct a schema, using GraphQL schema language
 const schema = buildSchema(`
   type CasesByLocation {
+    idKey: String!
     active: Int
     confirmed: Int!
     country: String!
@@ -19,10 +20,10 @@ const schema = buildSchema(`
     lastUpdate: String!
     latitude: String!
     longitude: String!
-    objectId: Int!
     province: String
     recovered: Int!
     casesByDate: [Cases]
+    provincesList: [String]
   }
 
   type Cases {
@@ -38,6 +39,7 @@ const schema = buildSchema(`
     casesByLocation: [CasesByLocation]
     getCasesWithCountry(country: String!): [CasesByLocation]
     getCasesWithCountryAndProvince(country: String!, province: String!): [CasesByLocation]
+    getCasesByIdKey(idKey: String!): [CasesByLocation]
     topXconfirmedByCountry(limit: Int!): [CasesByLocation]
     topXactiveByCountry(limit: Int!): [CasesByLocation]
     topXrecoveredByCountry(limit: Int!): [CasesByLocation]
@@ -59,6 +61,13 @@ const root = {
     const dbClient = getDBClient()
     const { allCountries } = await dbClient.collection('totals').findOne()
     return allCountries
+  },
+  getCasesByIdKey: async (args) => {
+    if (args && args.idKey) {
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({idKey: args.idKey})
+      return await cursor.toArray()
+    }
   },
   getCasesWithCountry: async (args) => {
     if (args && args.country) {

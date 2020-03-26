@@ -22,7 +22,7 @@ const schema = buildSchema(`
     longitude: String!
     province: String
     recovered: Int!
-    casesByDate: [Cases]
+    casesByDate: [timeSeriesCases]
     provincesList: [String]
   }
 
@@ -31,6 +31,12 @@ const schema = buildSchema(`
     recovered: Int!
     deaths: Int!
     active: Int!
+    day: String
+  }
+
+  type timeSeriesCases {
+    confirmed: Int!
+    deaths: Int!
     day: String
   }
 

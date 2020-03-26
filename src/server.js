@@ -23,8 +23,13 @@ const schema = buildSchema(`
     province: String
     recovered: Int!
     casesByDate: [timeSeriesCases]
-    provincesList: [String]
+    provincesList: [Province]
     hasProvince: Boolean
+  }
+
+  type Province {
+    idKey: String!
+    province: String!
   }
 
   type Cases {

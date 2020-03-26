@@ -24,6 +24,7 @@ const schema = buildSchema(`
     recovered: Int!
     casesByDate: [timeSeriesCases]
     provincesList: [String]
+    hasProvince: Boolean
   }
 
   type Cases {

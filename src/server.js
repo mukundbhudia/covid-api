@@ -17,6 +17,8 @@ const schema = buildSchema(`
     confirmed: Int!
     country: String!
     deaths: Int!
+    confirmedCasesToday: Int!
+    deathsToday: Int!
     lastUpdate: String!
     latitude: String!
     longitude: String!
@@ -37,6 +39,8 @@ const schema = buildSchema(`
     recovered: Int!
     deaths: Int!
     active: Int!
+    confirmedCasesToday: Int!
+    deathsToday: Int!
     day: String
   }
 
@@ -58,6 +62,8 @@ const schema = buildSchema(`
     topXactiveByCountry(limit: Int!): [CasesByLocation]
     topXrecoveredByCountry(limit: Int!): [CasesByLocation]
     topXdeathsByCountry(limit: Int!): [CasesByLocation]
+    topXconfirmedTodayByCountry(limit: Int!): [CasesByLocation]
+    topXdeathsTodayByCountry(limit: Int!): [CasesByLocation]
     lastUpdated: String!
     globalTimeSeries: [timeSeriesCases]
     getAllCountries: [String]
@@ -128,6 +134,20 @@ const root = {
     if (args && args.limit) {
       const dbClient = getDBClient()
       const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'deaths': -1}).limit(args.limit)
+      return await cursor.toArray()
+    }
+  },
+  topXconfirmedTodayByCountry: async (args) => {
+    if (args && args.limit) {
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'confirmedCasesToday': -1}).limit(args.limit)
+      return await cursor.toArray()
+    }
+  },
+  topXdeathsTodayByCountry: async (args) => {
+    if (args && args.limit) {
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({'province': null}).sort({'deathsToday': -1}).limit(args.limit)
       return await cursor.toArray()
     }
   },

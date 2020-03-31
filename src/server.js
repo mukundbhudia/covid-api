@@ -43,6 +43,8 @@ const schema = buildSchema(`
   type timeSeriesCases {
     confirmed: Int!
     deaths: Int!
+    confirmedCasesToday: Int!
+    deathsToday: Int!
     day: String
   }
 
@@ -57,7 +59,7 @@ const schema = buildSchema(`
     topXrecoveredByCountry(limit: Int!): [CasesByLocation]
     topXdeathsByCountry(limit: Int!): [CasesByLocation]
     lastUpdated: String!
-    globalTimeSeries: [Cases]
+    globalTimeSeries: [timeSeriesCases]
     getAllCountries: [String]
   }
 `)

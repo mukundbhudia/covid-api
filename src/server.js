@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 4000
 const schema = buildSchema(`
   type CasesByLocation {
     idKey: String!
+    countryCode: String
     active: Int
     confirmed: Int!
     country: String!
@@ -20,8 +21,8 @@ const schema = buildSchema(`
     confirmedCasesToday: Int!
     deathsToday: Int!
     lastUpdate: String!
-    latitude: String!
-    longitude: String!
+    latitude: String
+    longitude: String
     province: String
     recovered: Int!
     casesByDate: [timeSeriesCases]
@@ -55,6 +56,7 @@ const schema = buildSchema(`
   type Query {
     totalCases: Cases
     casesByLocation: [CasesByLocation]
+    casesByLocationWithNoProvince: [CasesByLocation]
     getCasesWithCountry(country: String!): [CasesByLocation]
     getCasesWithCountryAndProvince(country: String!, province: String!): [CasesByLocation]
     getCasesByIdKey(idKey: String!): [CasesByLocation]
@@ -159,6 +161,11 @@ const root = {
   casesByLocation: async () => {
     const dbClient = getDBClient()
     const cursor = await dbClient.collection('casesByLocation').find({})
+    return await cursor.toArray()
+  },
+  casesByLocationWithNoProvince: async () => {
+    const dbClient = getDBClient()
+    const cursor = await dbClient.collection('casesByLocation').find({'province': null})
     return await cursor.toArray()
   },
   totalCases: async () => {

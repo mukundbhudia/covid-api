@@ -165,7 +165,8 @@ const root = {
   },
   casesByLocationWithNoProvince: async () => {
     const dbClient = getDBClient()
-    const cursor = await dbClient.collection('casesByLocation').find({'province': null})
+    // We make an exception for Greenland as some datasets consider it to be it's on country
+    const cursor = await dbClient.collection('casesByLocation').find( { $or: [ { 'province': null }, { 'province': 'Greenland' } ] } )
     return await cursor.toArray()
   },
   totalCases: async () => {

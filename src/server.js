@@ -60,6 +60,7 @@ const schema = buildSchema(`
     getCasesWithCountry(country: String!): [CasesByLocation]
     getCasesWithCountryAndProvince(country: String!, province: String!): [CasesByLocation]
     getCasesByIdKey(idKey: String!): [CasesByLocation]
+    getProvincesGivenCountryName(country: String!): [Province]
     topXconfirmedByCountry(limit: Int!): [CasesByLocation]
     topXactiveByCountry(limit: Int!): [CasesByLocation]
     topXrecoveredByCountry(limit: Int!): [CasesByLocation]
@@ -109,6 +110,18 @@ const root = {
         province: args.province
       })
       return await cursor.toArray()
+    }
+  },
+  getProvincesGivenCountryName: async (args) => {
+    if (args && args.country) {
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({'province': null, country: args.country})
+      const result = await cursor.toArray()
+      if (result && result.length > 0) {
+        return result[0].provincesList
+      } else {
+        return []
+      }
     }
   },
   topXconfirmedByCountry: async (args) => {

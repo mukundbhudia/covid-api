@@ -53,6 +53,21 @@ const schema = buildSchema(`
     day: String
   }
 
+  type TimeCase {
+    country: String!
+    countryCode: String
+    idKey: String!
+    confirmed: Int!
+    deaths: Int!
+    confirmedCasesToday: Int!
+    deathsToday: Int!
+  }
+
+  type GlobalTimeCase {
+    day: String
+    casesOfTheDay: [TimeCase]
+  }
+
   type Query {
     totalCases: Cases
     casesByLocation: [CasesByLocation]
@@ -70,6 +85,7 @@ const schema = buildSchema(`
     lastUpdated: String!
     globalTimeSeries: [timeSeriesCases]
     getAllCountries: [String]
+    getGlobalCasesByDate: [GlobalTimeCase]
   }
 `)
 
@@ -84,6 +100,11 @@ const root = {
     const dbClient = getDBClient()
     const { allCountries } = await dbClient.collection('totals').findOne()
     return allCountries
+  },
+  getGlobalCasesByDate: async () => {
+    const dbClient = getDBClient()
+    const { globalCasesByDate } = await dbClient.collection('totals').findOne()
+    return globalCasesByDate
   },
   getCasesByIdKey: async (args) => {
     if (args && args.idKey) {

@@ -58,6 +58,8 @@ const schema = buildSchema(`
     countryCode: String
     idKey: String!
     confirmed: Int!
+    active: Int
+    recovered: Int
     deaths: Int!
     confirmedCasesToday: Int!
     deathsToday: Int!
@@ -85,7 +87,8 @@ const schema = buildSchema(`
     lastUpdated: String!
     globalTimeSeries: [timeSeriesCases]
     getAllCountries: [String]
-    getGlobalCasesByDate: [GlobalTimeCase]
+    getGlobalCasesByDate(day: String!): [TimeCase]
+    getAllDaysWithCases: [String]
   }
 `)
 
@@ -101,10 +104,23 @@ const root = {
     const { allCountries } = await dbClient.collection('totals').findOne()
     return allCountries
   },
-  getGlobalCasesByDate: async () => {
+  getAllDaysWithCases: async () => {
     const dbClient = getDBClient()
     const { globalCasesByDate } = await dbClient.collection('totals').findOne()
-    return globalCasesByDate
+    return globalCasesByDate.map((cases) => { return cases.day })
+  },
+  getGlobalCasesByDate: async (args) => {
+    if (args && args.day) {
+      const dbClient = getDBClient()
+      const { globalCasesByDate } = await dbClient.collection('totals').findOne()
+      let results = []
+      globalCasesByDate.forEach(globalCase => {
+        if (globalCase.day === args.day) {
+          results = globalCase.casesOfTheDay
+        }
+      })
+      return results
+    }
   },
   getCasesByIdKey: async (args) => {
     if (args && args.idKey) {

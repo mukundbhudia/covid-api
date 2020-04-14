@@ -117,6 +117,7 @@ const root = {
       globalCasesByDate.forEach(globalCase => {
         if (globalCase.day === args.day) {
           results = globalCase.casesOfTheDay
+          return results
         }
       })
       return results

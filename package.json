@@ -26,15 +26,15 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
-    "graphql": "^14.6.0",
-    "mongodb": "^3.5.5"
+    "graphql": "^15.0.0",
+    "mongodb": "^3.5.8"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
-    "babel-loader": "^8.0.6",
+    "babel-loader": "^8.1.0",
     "babel-node": "0.0.1-security",
     "babel-preset-env": "^1.7.0",
-    "nodemon": "^2.0.2"
+    "nodemon": "^2.0.4"
   }
 }

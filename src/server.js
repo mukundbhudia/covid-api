@@ -77,6 +77,7 @@ const schema = buildSchema(`
     getCasesWithCountry(country: String!): [CasesByLocation]
     getCasesWithCountryAndProvince(country: String!, province: String!): [CasesByLocation]
     getCasesByIdKey(idKey: String!): [CasesByLocation]
+    getManyCasesByIdKey(idKeys: [String]!): [CasesByLocation]
     getProvincesGivenCountryName(country: String!): [CasesByLocation]
     topXconfirmedByCountry(limit: Int!): [CasesByLocation]
     topXactiveByCountry(limit: Int!): [CasesByLocation]
@@ -127,6 +128,13 @@ const root = {
     if (args && args.idKey) {
       const dbClient = getDBClient()
       const cursor = await dbClient.collection('casesByLocation').find({idKey: args.idKey})
+      return await cursor.toArray()
+    }
+  },
+  getManyCasesByIdKey: async (args) => {
+    if (args && args.idKeys) {
+      const dbClient = getDBClient()
+      const cursor = await dbClient.collection('casesByLocation').find({idKey: { "$in" : args.idKeys}})
       return await cursor.toArray()
     }
   },

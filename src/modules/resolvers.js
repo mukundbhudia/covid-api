@@ -1,4 +1,4 @@
-const { connectDB, getDBClient, disconnectDB } = require('../src/dbClient')
+const { connectDB, getDBClient } = require('./dbClient')
 
 const loadDbAndClient = async () => {
   await connectDB()

@@ -1,8 +1,8 @@
 const express = require('express')
 const { graphqlHTTP } = require('express-graphql')
 const cors = require('cors')
-const { schema } = require('./schema')
-const { root } = require('./resolvers')
+const { schema } = require('./modules/schema')
+const { root } = require('./modules/resolvers')
 
 require('dotenv').config()
 

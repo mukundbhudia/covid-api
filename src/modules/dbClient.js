@@ -16,8 +16,8 @@ const connectDB = async () => {
 }
 
 const disconnectDB = () => client.close()
-const getDBClient = () => client.db(dbName)
-const getClient = () => client
+const getDBClient = async () => client.db(dbName)
+const getClient = async () => client
 
 module.exports = {
   connectDB,

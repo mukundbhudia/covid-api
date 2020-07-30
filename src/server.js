@@ -7,7 +7,7 @@ const { root } = require('./modules/resolvers')
 
 require('dotenv').config()
 
-const PORT = process.env.PORT || 4000
+const SERVER_PORT = process.env.PORT || 4000
 
 const app = express()
 
@@ -19,9 +19,9 @@ const startServer = async () => {
       rootValue: root,
       graphiql: true,
     }))
-    .listen(PORT)
+    .listen(SERVER_PORT)
 
-  console.log(`Running a GraphQL API server at http://localhost:${PORT}/graphql`)
+  console.log(`Running a GraphQL API server at http://localhost:${SERVER_PORT}/graphql`)
 }
 
 startServer()

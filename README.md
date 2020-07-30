@@ -1,5 +1,10 @@
 # covid-api
 GraphQuery API that serves Johns Hopkins CSSE data on covid-19. Uses Node, express, graphQL, mongoDB.
+This project works in conjunction with [covid-web](https://github.com/mukundbhudia/covid-api) and [covid-service](https://github.com/mukundbhudia/covid-service).
+
+## Demo
+
+A working demo of his API is avaiable at https://covid19-dash-api.herokuapp.com/. Use the [GraphiQL web interface](https://covid19-dash-api.herokuapp.com/graphql) to explore the data structure and perform queries.
 
 ## Available Scripts
 

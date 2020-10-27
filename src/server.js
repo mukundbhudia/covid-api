@@ -13,14 +13,18 @@ const app = express()
 
 const startServer = async () => {
   await connectDB()
-  app.use(cors())
-    .use('/graphql', graphqlHTTP({
-      schema: schema,
-      rootValue: root,
-      graphiql: true,
-    }))
+  app
+    .use(cors())
+    .use(
+      '/graphql',
+      graphqlHTTP({
+        schema: schema,
+        rootValue: root,
+        graphiql: true,
+      })
+    )
     .listen(SERVER_PORT)
-  
+
   const welcomeMessage = `Running covid-api GQL server at http://localhost:${SERVER_PORT}/graphql in env: ${process.env.NODE_ENV}`
   console.log(welcomeMessage)
   logger.info(welcomeMessage)

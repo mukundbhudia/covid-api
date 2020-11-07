@@ -29,7 +29,7 @@
     "express": "^4.17.1",
     "express-graphql": "^0.11.0",
     "graphql": "^15.4.0",
-    "mongodb": "^3.6.2",
+    "mongodb": "^3.6.3",
     "winston": "^3.3.3"
   },
   "devDependencies": {

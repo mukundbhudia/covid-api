@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb')
 
 let client
-const DB_NAME = 'covid19'
+const DB_NAME = process.env.MONGO_DB || 'covid19'
 
 const connectDB = async () => {
   let dbURI = process.env.MONGO_URI || 'mongodb://localhost:27017'

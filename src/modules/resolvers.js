@@ -1,6 +1,7 @@
 const { logger } = require('../modules/logger')
-const { getDBClient } = require('./dbClient')
+const { getDBClient, connectCache } = require('./dbClient')
 
+const CACHE_TTL = 20 * 60   // Time in seconds key lives in cache
 const TOTALS_COLLECTION = 'totals'
 const CASES_BY_LOCATION_COLLECTION = 'casesByLocation'
 
@@ -224,8 +225,19 @@ const root = {
   },
   lastUpdated: async () => {
     const dbClient = await getDBClient()
-    const { timeStamp } = await dbClient.collection(TOTALS_COLLECTION).findOne()
-    logger.debug(`Resolver 'lastUpdated' with: '${timeStamp.toLocaleString()}'`)
+    const { cacheClient, getAsync } = await connectCache()
+    const cachedLastUpdated = await getAsync('lastUpdated')
+    let timeStamp = null
+    if (cachedLastUpdated) {
+      timeStamp = JSON.parse(cachedLastUpdated)
+      logger.debug('lastUpdated from cache')
+    } else {
+      let dbResult = await dbClient.collection(TOTALS_COLLECTION).findOne()
+      timeStamp = dbResult.timeStamp
+      cacheClient.setex('lastUpdated', CACHE_TTL, JSON.stringify(timeStamp.getTime()))
+      logger.debug('lastUpdated from db')
+    }
+    logger.debug(`Resolver 'lastUpdated' with: '${new Date(timeStamp).toLocaleString()}'`)
     return timeStamp
   },
   casesByLocation: async () => {

@@ -252,16 +252,29 @@ const root = {
   },
   casesByLocationWithNoProvince: async () => {
     const dbClient = await getDBClient()
-    // We make an exception for Greenland as some datasets consider it to be it's on country
-    const result = await dbClient
-      .collection(CASES_BY_LOCATION_COLLECTION)
-      .find({ $or: [{ province: null }, { province: 'Greenland' }] })
-      .sort({ country: 1 })
-      .toArray()
+    const { cacheClient, getAsync } = await connectCache()
+    const cachedCases = await getAsync('casesByLocationWithNoProvince')
+
+    let casesByLocationWithNoProvince = null
+
+    if (cachedCases) {
+      casesByLocationWithNoProvince = JSON.parse(cachedCases)
+      logger.debug('casesByLocationWithNoProvince from cache')
+    } else {
+      // We make an exception for Greenland as some datasets consider it to be it's on country
+      casesByLocationWithNoProvince = await dbClient
+        .collection(CASES_BY_LOCATION_COLLECTION)
+        .find({ $or: [{ province: null }, { province: 'Greenland' }] })
+        .sort({ country: 1 })
+        .toArray()
+      cacheClient.setex('casesByLocationWithNoProvince', CACHE_TTL, JSON.stringify(casesByLocationWithNoProvince))
+      logger.debug('casesByLocationWithNoProvince from db')
+    }
+
     logger.debug(
-      `Resolver 'casesByLocationWithNoProvince' with: ${result.length} cases`
+      `Resolver 'casesByLocationWithNoProvince' with: ${casesByLocationWithNoProvince.length} cases`
     )
-    return result
+    return casesByLocationWithNoProvince
   },
   totalCases: async () => {
     const dbClient = await getDBClient()

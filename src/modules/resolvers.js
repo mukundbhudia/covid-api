@@ -1,7 +1,7 @@
 const { logger } = require('../modules/logger')
 const { getDBClient, connectCache } = require('./dbClient')
 
-const CACHE_TTL = 20 * 60   // Time in seconds key lives in cache
+const CACHE_TTL = 20 * 60 // Time in seconds key lives in cache
 const TOTALS_COLLECTION = 'totals'
 const CASES_BY_LOCATION_COLLECTION = 'casesByLocation'
 
@@ -136,91 +136,191 @@ const root = {
   topXconfirmedByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const result = await dbClient
-        .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ province: null })
-        .sort({ confirmed: -1 })
-        .limit(args.limit)
-        .toArray()
+      const { cacheClient, getAsync } = await connectCache()
+      const cachedTopX = await getAsync(`topXconfirmedByCountry-${args.limit}`)
+
+      let topXconfirmedByCountry = null
+
+      if (cachedTopX) {
+        topXconfirmedByCountry = JSON.parse(cachedTopX)
+        logger.debug('topXconfirmedByCountry from cache')
+      } else {
+        topXconfirmedByCountry = await dbClient
+          .collection(CASES_BY_LOCATION_COLLECTION)
+          .find({ province: null })
+          .sort({ confirmed: -1 })
+          .limit(args.limit)
+          .toArray()
+        cacheClient.setex(
+          `topXconfirmedByCountry-${args.limit}`,
+          CACHE_TTL,
+          JSON.stringify(topXconfirmedByCountry)
+        )
+        logger.debug('topXconfirmedByCountry from db')
+      }
       logger.debug(
-        `Resolver 'topXconfirmedByCountry' with: ${result.length} cases for '${args.limit}'`
+        `Resolver 'topXconfirmedByCountry' with: ${topXconfirmedByCountry.length} cases for '${args.limit}'`
       )
-      return result
+      return topXconfirmedByCountry
     }
   },
   topXactiveByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const result = await dbClient
-        .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ province: null })
-        .sort({ active: -1 })
-        .limit(args.limit)
-        .toArray()
+      const { cacheClient, getAsync } = await connectCache()
+      const cachedTopX = await getAsync(`topXactiveByCountry-${args.limit}`)
+
+      let topXactiveByCountry = null
+
+      if (cachedTopX) {
+        topXactiveByCountry = JSON.parse(cachedTopX)
+        logger.debug('topXactiveByCountry from cache')
+      } else {
+        topXactiveByCountry = await dbClient
+          .collection(CASES_BY_LOCATION_COLLECTION)
+          .find({ province: null })
+          .sort({ active: -1 })
+          .limit(args.limit)
+          .toArray()
+        cacheClient.setex(
+          `topXactiveByCountry-${args.limit}`,
+          CACHE_TTL,
+          JSON.stringify(topXactiveByCountry)
+        )
+        logger.debug('topXactiveByCountry from db')
+      }
       logger.debug(
-        `Resolver 'topXactiveByCountry' with: ${result.length} cases for '${args.limit}'`
+        `Resolver 'topXactiveByCountry' with: ${topXactiveByCountry.length} cases for '${args.limit}'`
       )
-      return result
+      return topXactiveByCountry
     }
   },
   topXrecoveredByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const result = await dbClient
-        .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ province: null })
-        .sort({ recovered: -1 })
-        .limit(args.limit)
-        .toArray()
+      const { cacheClient, getAsync } = await connectCache()
+      const cachedTopX = await getAsync(`topXrecoveredByCountry-${args.limit}`)
+
+      let topXrecoveredByCountry = null
+
+      if (cachedTopX) {
+        topXrecoveredByCountry = JSON.parse(cachedTopX)
+        logger.debug('topXrecoveredByCountry from cache')
+      } else {
+        topXrecoveredByCountry = await dbClient
+          .collection(CASES_BY_LOCATION_COLLECTION)
+          .find({ province: null })
+          .sort({ recovered: -1 })
+          .limit(args.limit)
+          .toArray()
+        cacheClient.setex(
+          `topXrecoveredByCountry-${args.limit}`,
+          CACHE_TTL,
+          JSON.stringify(topXrecoveredByCountry)
+        )
+        logger.debug('topXrecoveredByCountry from db')
+      }
       logger.debug(
-        `Resolver 'topXrecoveredByCountry' with: ${result.length} cases for '${args.limit}'`
+        `Resolver 'topXrecoveredByCountry' with: ${topXrecoveredByCountry.length} cases for '${args.limit}'`
       )
-      return result
+      return topXrecoveredByCountry
     }
   },
   topXdeathsByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const result = await dbClient
-        .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ province: null })
-        .sort({ deaths: -1 })
-        .limit(args.limit)
-        .toArray()
+      const { cacheClient, getAsync } = await connectCache()
+      const cachedTopX = await getAsync(`topXdeathsByCountry-${args.limit}`)
+
+      let topXdeathsByCountry = null
+
+      if (cachedTopX) {
+        topXdeathsByCountry = JSON.parse(cachedTopX)
+        logger.debug('topXdeathsByCountry from cache')
+      } else {
+        topXdeathsByCountry = await dbClient
+          .collection(CASES_BY_LOCATION_COLLECTION)
+          .find({ province: null })
+          .sort({ deaths: -1 })
+          .limit(args.limit)
+          .toArray()
+        cacheClient.setex(
+          `topXdeathsByCountry-${args.limit}`,
+          CACHE_TTL,
+          JSON.stringify(topXdeathsByCountry)
+        )
+        logger.debug('topXdeathsByCountry from db')
+      }
       logger.debug(
-        `Resolver 'topXdeathsByCountry' with: ${result.length} cases for '${args.limit}'`
+        `Resolver 'topXdeathsByCountry' with: ${topXdeathsByCountry.length} cases for '${args.limit}'`
       )
-      return result
+      return topXdeathsByCountry
     }
   },
   topXconfirmedTodayByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const result = await dbClient
-        .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ province: null })
-        .sort({ confirmedCasesToday: -1 })
-        .limit(args.limit)
-        .toArray()
-      logger.debug(
-        `Resolver 'topXconfirmedTodayByCountry' with: ${result.length} cases for '${args.limit}'`
+      const { cacheClient, getAsync } = await connectCache()
+      const cachedTopX = await getAsync(
+        `topXconfirmedTodayByCountry-${args.limit}`
       )
-      return result
+
+      let topXconfirmedTodayByCountry = null
+
+      if (cachedTopX) {
+        topXconfirmedTodayByCountry = JSON.parse(cachedTopX)
+        logger.debug('topXconfirmedTodayByCountry from cache')
+      } else {
+        topXconfirmedTodayByCountry = await dbClient
+          .collection(CASES_BY_LOCATION_COLLECTION)
+          .find({ province: null })
+          .sort({ confirmedCasesToday: -1 })
+          .limit(args.limit)
+          .toArray()
+        cacheClient.setex(
+          `topXconfirmedTodayByCountry-${args.limit}`,
+          CACHE_TTL,
+          JSON.stringify(topXconfirmedTodayByCountry)
+        )
+        logger.debug('topXconfirmedTodayByCountry from db')
+      }
+      logger.debug(
+        `Resolver 'topXconfirmedTodayByCountry' with: ${topXconfirmedTodayByCountry.length} cases for '${args.limit}'`
+      )
+      return topXconfirmedTodayByCountry
     }
   },
   topXdeathsTodayByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const result = await dbClient
-        .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ province: null })
-        .sort({ deathsToday: -1 })
-        .limit(args.limit)
-        .toArray()
-      logger.debug(
-        `Resolver 'topXdeathsTodayByCountry' with: ${result.length} cases for '${args.limit}'`
+      const { cacheClient, getAsync } = await connectCache()
+      const cachedTopX = await getAsync(
+        `topXdeathsTodayByCountry-${args.limit}`
       )
-      return result
+
+      let topXdeathsTodayByCountry = null
+
+      if (cachedTopX) {
+        topXdeathsTodayByCountry = JSON.parse(cachedTopX)
+        logger.debug('topXdeathsTodayByCountry from cache')
+      } else {
+        topXdeathsTodayByCountry = await dbClient
+          .collection(CASES_BY_LOCATION_COLLECTION)
+          .find({ province: null })
+          .sort({ deathsToday: -1 })
+          .limit(args.limit)
+          .toArray()
+        cacheClient.setex(
+          `topXdeathsTodayByCountry-${args.limit}`,
+          CACHE_TTL,
+          JSON.stringify(topXdeathsTodayByCountry)
+        )
+        logger.debug('topXdeathsTodayByCountry from db')
+      }
+      logger.debug(
+        `Resolver 'topXdeathsTodayByCountry' with: ${topXdeathsTodayByCountry.length} cases for '${args.limit}'`
+      )
+      return topXdeathsTodayByCountry
     }
   },
   lastUpdated: async () => {
@@ -234,10 +334,16 @@ const root = {
     } else {
       let dbResult = await dbClient.collection(TOTALS_COLLECTION).findOne()
       timeStamp = dbResult.timeStamp
-      cacheClient.setex('lastUpdated', CACHE_TTL, JSON.stringify(timeStamp.getTime()))
+      cacheClient.setex(
+        'lastUpdated',
+        CACHE_TTL,
+        JSON.stringify(timeStamp.getTime())
+      )
       logger.debug('lastUpdated from db')
     }
-    logger.debug(`Resolver 'lastUpdated' with: '${new Date(timeStamp).toLocaleString()}'`)
+    logger.debug(
+      `Resolver 'lastUpdated' with: '${new Date(timeStamp).toLocaleString()}'`
+    )
     return timeStamp
   },
   casesByLocation: async () => {
@@ -267,7 +373,11 @@ const root = {
         .find({ $or: [{ province: null }, { province: 'Greenland' }] })
         .sort({ country: 1 })
         .toArray()
-      cacheClient.setex('casesByLocationWithNoProvince', CACHE_TTL, JSON.stringify(casesByLocationWithNoProvince))
+      cacheClient.setex(
+        'casesByLocationWithNoProvince',
+        CACHE_TTL,
+        JSON.stringify(casesByLocationWithNoProvince)
+      )
       logger.debug('casesByLocationWithNoProvince from db')
     }
 

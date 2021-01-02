@@ -1,5 +1,6 @@
 const { logger } = require('../modules/logger')
 const { getDBClient, connectCache } = require('./dbClient')
+const { cacheClient, getAsync } = connectCache()
 
 const CACHE_TTL = 20 * 60 // Time in seconds key lives in cache
 const TOTALS_COLLECTION = 'totals'
@@ -9,7 +10,6 @@ const CASES_BY_LOCATION_COLLECTION = 'casesByLocation'
 const root = {
   globalTimeSeries: async () => {
     const dbClient = await getDBClient()
-    const { cacheClient, getAsync } = await connectCache()
     const cachedGlobalTimeSeries = await getAsync(`globalTimeSeries`)
 
     let timeSeriesTotalCasesByDate = null
@@ -44,7 +44,6 @@ const root = {
   },
   getAllDaysWithCases: async () => {
     const dbClient = await getDBClient()
-    const { cacheClient, getAsync } = await connectCache()
     const cachedAllDaysWithCases = await getAsync(`allDaysWithCases`)
 
     let allDaysWithCases = null
@@ -73,7 +72,6 @@ const root = {
   getGlobalCasesByDate: async (args) => {
     if (args && args.day) {
       const dbClient = await getDBClient()
-      const { cacheClient, getAsync } = await connectCache()
       const cachedGlobalCasesByDate = await getAsync(
         `globalCasesByDate-${args.day}`
       )
@@ -120,7 +118,6 @@ const root = {
   getManyCasesByIdKey: async (args) => {
     if (args && args.idKeys) {
       const dbClient = await getDBClient()
-      const { cacheClient, getAsync } = await connectCache()
       const idKeysAsStrings = args.idKeys.join(':')
       const cachedManyCasesByIdKey = await getAsync(
         `manyCasesByIdKey-${idKeysAsStrings}`
@@ -198,7 +195,6 @@ const root = {
   topXconfirmedByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const { cacheClient, getAsync } = await connectCache()
       const cachedTopX = await getAsync(`topXconfirmedByCountry-${args.limit}`)
 
       let topXconfirmedByCountry = null
@@ -229,7 +225,6 @@ const root = {
   topXactiveByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const { cacheClient, getAsync } = await connectCache()
       const cachedTopX = await getAsync(`topXactiveByCountry-${args.limit}`)
 
       let topXactiveByCountry = null
@@ -260,7 +255,6 @@ const root = {
   topXrecoveredByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const { cacheClient, getAsync } = await connectCache()
       const cachedTopX = await getAsync(`topXrecoveredByCountry-${args.limit}`)
 
       let topXrecoveredByCountry = null
@@ -291,7 +285,6 @@ const root = {
   topXdeathsByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const { cacheClient, getAsync } = await connectCache()
       const cachedTopX = await getAsync(`topXdeathsByCountry-${args.limit}`)
 
       let topXdeathsByCountry = null
@@ -322,7 +315,6 @@ const root = {
   topXconfirmedTodayByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const { cacheClient, getAsync } = await connectCache()
       const cachedTopX = await getAsync(
         `topXconfirmedTodayByCountry-${args.limit}`
       )
@@ -355,7 +347,6 @@ const root = {
   topXdeathsTodayByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const { cacheClient, getAsync } = await connectCache()
       const cachedTopX = await getAsync(
         `topXdeathsTodayByCountry-${args.limit}`
       )
@@ -387,7 +378,6 @@ const root = {
   },
   lastUpdated: async () => {
     const dbClient = await getDBClient()
-    const { cacheClient, getAsync } = await connectCache()
     const cachedLastUpdated = await getAsync('lastUpdated')
     let timeStamp = null
     if (cachedLastUpdated) {
@@ -410,7 +400,6 @@ const root = {
   },
   casesByLocation: async () => {
     const dbClient = await getDBClient()
-    const { cacheClient, getAsync } = await connectCache()
     const cachedCasesByLocation = await getAsync('casesByLocation')
 
     let casesByLocation = null
@@ -438,7 +427,6 @@ const root = {
   },
   casesByLocationWithNoProvince: async () => {
     const dbClient = await getDBClient()
-    const { cacheClient, getAsync } = await connectCache()
     const cachedCases = await getAsync('casesByLocationWithNoProvince')
 
     let casesByLocationWithNoProvince = null
@@ -468,7 +456,6 @@ const root = {
   },
   totalCases: async () => {
     const dbClient = await getDBClient()
-    const { cacheClient, getAsync } = await connectCache()
     const cachedTotalCases = await getAsync('totalCases')
 
     let totalCases = null

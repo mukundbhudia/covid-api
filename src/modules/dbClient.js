@@ -17,7 +17,7 @@ const connectDB = async () => {
   }
 }
 
-const connectCache = async () => {
+const connectCache = () => {
   const REDIS_URL = process.env.REDIS_URL || 6379
   try {
     cacheClient = redis.createClient(REDIS_URL)

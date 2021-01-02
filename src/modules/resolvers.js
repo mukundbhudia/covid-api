@@ -105,14 +105,29 @@ const root = {
   getCasesByIdKey: async (args) => {
     if (args && args.idKey) {
       const dbClient = await getDBClient()
-      const result = await dbClient
-        .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ idKey: args.idKey })
-        .toArray()
+      const cachedCasesByIdKey = await getAsync(`casesByIdKey-${args.idKey}`)
+
+      let casesByIdKey = null
+
+      if (cachedCasesByIdKey) {
+        casesByIdKey = JSON.parse(cachedCasesByIdKey)
+        logger.debug('casesByIdKey from cache')
+      } else {
+        casesByIdKey = await dbClient
+          .collection(CASES_BY_LOCATION_COLLECTION)
+          .find({ idKey: args.idKey })
+          .toArray()
+        cacheClient.setex(
+          `casesByIdKey-${args.idKey}`,
+          CACHE_TTL,
+          JSON.stringify(casesByIdKey)
+        )
+        logger.debug('casesByIdKey from db')
+      }
       logger.debug(
-        `Resolver 'getCasesByIdKey' with: ${result.length} cases for '${args.idKey}'`
+        `Resolver 'getCasesByIdKey' with: ${casesByIdKey.length} cases for '${args.idKey}'`
       )
-      return result
+      return casesByIdKey
     }
   },
   getManyCasesByIdKey: async (args) => {
@@ -181,15 +196,33 @@ const root = {
   getProvincesGivenCountryName: async (args) => {
     if (args && args.country) {
       const dbClient = await getDBClient()
-      const result = await dbClient
-        .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ hasProvince: false, country: args.country })
-        .sort({ confirmed: -1 })
-        .toArray()
-      logger.debug(
-        `Resolver 'getProvincesGivenCountryName' with: ${result.length} cases for '${args.country}'`
+
+      const cachedProvincesGivenCountryName = await getAsync(
+        `provincesGivenCountryName-${args.country}`
       )
-      return result
+
+      let provincesGivenCountryName = null
+
+      if (cachedProvincesGivenCountryName) {
+        provincesGivenCountryName = JSON.parse(cachedProvincesGivenCountryName)
+        logger.debug('provincesGivenCountryName from cache')
+      } else {
+        provincesGivenCountryName = await dbClient
+          .collection(CASES_BY_LOCATION_COLLECTION)
+          .find({ hasProvince: false, country: args.country })
+          .sort({ confirmed: -1 })
+          .toArray()
+        cacheClient.setex(
+          `provincesGivenCountryName-${args.country}`,
+          CACHE_TTL,
+          JSON.stringify(provincesGivenCountryName)
+        )
+        logger.debug('provincesGivenCountryName from db')
+      }
+      logger.debug(
+        `Resolver 'getProvincesGivenCountryName' with: ${provincesGivenCountryName.length} cases for '${args.country}'`
+      )
+      return provincesGivenCountryName
     }
   },
   topXconfirmedByCountry: async (args) => {

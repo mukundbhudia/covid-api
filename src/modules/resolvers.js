@@ -9,9 +9,24 @@ const CASES_BY_LOCATION_COLLECTION = 'casesByLocation'
 const root = {
   globalTimeSeries: async () => {
     const dbClient = await getDBClient()
-    const { timeSeriesTotalCasesByDate } = await dbClient
-      .collection(TOTALS_COLLECTION)
-      .findOne()
+    const { cacheClient, getAsync } = await connectCache()
+    const cachedGlobalTimeSeries = await getAsync(`globalTimeSeries`)
+
+    let timeSeriesTotalCasesByDate = null
+
+    if (cachedGlobalTimeSeries) {
+      timeSeriesTotalCasesByDate = JSON.parse(cachedGlobalTimeSeries)
+      logger.debug('globalTimeSeries from cache')
+    } else {
+      let result = await dbClient.collection(TOTALS_COLLECTION).findOne()
+      timeSeriesTotalCasesByDate = result.timeSeriesTotalCasesByDate
+      cacheClient.setex(
+        `globalTimeSeries`,
+        CACHE_TTL,
+        JSON.stringify(timeSeriesTotalCasesByDate)
+      )
+      logger.debug('globalTimeSeries from db')
+    }
     logger.debug(
       `Resolver 'globalTimeSeries' with: ${timeSeriesTotalCasesByDate.length} cases`
     )
@@ -29,36 +44,65 @@ const root = {
   },
   getAllDaysWithCases: async () => {
     const dbClient = await getDBClient()
-    const { globalCasesByDate } = await dbClient
-      .collection(TOTALS_COLLECTION)
-      .findOne()
+    const { cacheClient, getAsync } = await connectCache()
+    const cachedAllDaysWithCases = await getAsync(`allDaysWithCases`)
+
+    let allDaysWithCases = null
+
+    if (cachedAllDaysWithCases) {
+      allDaysWithCases = JSON.parse(cachedAllDaysWithCases)
+      logger.debug('allDaysWithCases from cache')
+    } else {
+      let result = await dbClient.collection(TOTALS_COLLECTION).findOne()
+      allDaysWithCases = result.globalCasesByDate.map((cases) => {
+        return cases.day
+      })
+      cacheClient.setex(
+        `allDaysWithCases`,
+        CACHE_TTL,
+        JSON.stringify(allDaysWithCases)
+      )
+      logger.debug('allDaysWithCases from db')
+    }
     logger.debug(
-      `Resolver 'getAllDaysWithCases' with: ${globalCasesByDate.length} days`
+      `Resolver 'getAllDaysWithCases' with: ${allDaysWithCases.length} days`
     )
-    return globalCasesByDate.map((cases) => {
-      return cases.day
-    })
+
+    return allDaysWithCases
   },
   getGlobalCasesByDate: async (args) => {
     if (args && args.day) {
       const dbClient = await getDBClient()
-      const { globalCasesByDate } = await dbClient
-        .collection(TOTALS_COLLECTION)
-        .findOne()
-      let results = []
-      globalCasesByDate.forEach((globalCase) => {
-        if (globalCase.day === args.day) {
-          results = globalCase.casesOfTheDay
-          logger.debug(
-            `Resolver 'getGlobalCasesByDate' with: ${results.length} cases for '${args.day}'`
-          )
-          return results
-        }
-      })
-      logger.debug(
-        `Resolver 'getGlobalCasesByDate' with: ${results.length} cases for '${args.day}'`
+      const { cacheClient, getAsync } = await connectCache()
+      const cachedGlobalCasesByDate = await getAsync(
+        `globalCasesByDate-${args.day}`
       )
-      return results
+
+      let globalCasesByDate = []
+
+      if (cachedGlobalCasesByDate) {
+        globalCasesByDate = JSON.parse(cachedGlobalCasesByDate)
+        logger.debug('globalCasesByDate from cache')
+      } else {
+        let result = await dbClient.collection(TOTALS_COLLECTION).findOne()
+        let foundCases = result.globalCasesByDate.filter((globalCase) => {
+          return globalCase.day === args.day
+        })
+        if (foundCases && foundCases.length > 0) {
+          globalCasesByDate = foundCases[0].casesOfTheDay
+        }
+        console.log(globalCasesByDate)
+        cacheClient.setex(
+          `globalCasesByDate-${args.day}`,
+          CACHE_TTL,
+          JSON.stringify(globalCasesByDate)
+        )
+        logger.debug('globalCasesByDate from db')
+      }
+      logger.debug(
+        `Resolver 'getGlobalCasesByDate' with: ${globalCasesByDate.length} cases for '${args.day}'`
+      )
+      return globalCasesByDate
     }
   },
   getCasesByIdKey: async (args) => {
@@ -348,13 +392,31 @@ const root = {
   },
   casesByLocation: async () => {
     const dbClient = await getDBClient()
-    const result = await dbClient
-      .collection(CASES_BY_LOCATION_COLLECTION)
-      .find({})
-      .sort({ province: 1 })
-      .toArray()
-    logger.debug(`Resolver 'casesByLocation' with: ${result.length} cases`)
-    return result
+    const { cacheClient, getAsync } = await connectCache()
+    const cachedCasesByLocation = await getAsync('casesByLocation')
+
+    let casesByLocation = null
+
+    if (cachedCasesByLocation) {
+      casesByLocation = JSON.parse(cachedCasesByLocation)
+      logger.debug('casesByLocation from cache')
+    } else {
+      casesByLocation = await dbClient
+        .collection(CASES_BY_LOCATION_COLLECTION)
+        .find({})
+        .sort({ province: 1 })
+        .toArray()
+      cacheClient.setex(
+        'casesByLocation',
+        CACHE_TTL,
+        JSON.stringify(casesByLocation)
+      )
+      logger.debug('casesByLocation from db')
+    }
+    logger.debug(
+      `Resolver 'casesByLocation' with: ${casesByLocation.length} cases`
+    )
+    return casesByLocation
   },
   casesByLocationWithNoProvince: async () => {
     const dbClient = await getDBClient()
@@ -388,9 +450,21 @@ const root = {
   },
   totalCases: async () => {
     const dbClient = await getDBClient()
-    const result = await dbClient.collection(TOTALS_COLLECTION).findOne()
+    const { cacheClient, getAsync } = await connectCache()
+    const cachedTotalCases = await getAsync('totalCases')
+
+    let totalCases = null
+
+    if (cachedTotalCases) {
+      totalCases = JSON.parse(cachedTotalCases)
+      logger.debug('totalCases from cache')
+    } else {
+      totalCases = await dbClient.collection(TOTALS_COLLECTION).findOne()
+      cacheClient.setex('totalCases', CACHE_TTL, JSON.stringify(totalCases))
+      logger.debug('totalCases from db')
+    }
     logger.debug(`Resolver 'totalCases'`)
-    return result
+    return totalCases
   },
 }
 

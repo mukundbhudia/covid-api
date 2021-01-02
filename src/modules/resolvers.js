@@ -121,14 +121,33 @@ const root = {
   getManyCasesByIdKey: async (args) => {
     if (args && args.idKeys) {
       const dbClient = await getDBClient()
-      const result = await dbClient
-        .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ idKey: { $in: args.idKeys } })
-        .toArray()
-      logger.debug(
-        `Resolver 'getManyCasesByIdKey' with: ${result.length} cases for '${args.idKeys}'`
+      const { cacheClient, getAsync } = await connectCache()
+      const idKeysAsStrings = args.idKeys.join(':')
+      const cachedManyCasesByIdKey = await getAsync(
+        `manyCasesByIdKey-${idKeysAsStrings}`
       )
-      return result
+
+      let manyCasesByIdKey = null
+
+      if (cachedManyCasesByIdKey) {
+        manyCasesByIdKey = JSON.parse(cachedManyCasesByIdKey)
+        logger.debug('manyCasesByIdKey from cache')
+      } else {
+        manyCasesByIdKey = await dbClient
+          .collection(CASES_BY_LOCATION_COLLECTION)
+          .find({ idKey: { $in: args.idKeys } })
+          .toArray()
+        cacheClient.setex(
+          `manyCasesByIdKey-${idKeysAsStrings}`,
+          CACHE_TTL,
+          JSON.stringify(manyCasesByIdKey)
+        )
+        logger.debug('manyCasesByIdKey from db')
+      }
+      logger.debug(
+        `Resolver 'getManyCasesByIdKey' with: ${manyCasesByIdKey.length} cases for '${args.idKeys}'`
+      )
+      return manyCasesByIdKey
     }
   },
   getCasesWithCountry: async (args) => {

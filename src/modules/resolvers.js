@@ -91,7 +91,6 @@ const root = {
         if (foundCases && foundCases.length > 0) {
           globalCasesByDate = foundCases[0].casesOfTheDay
         }
-        console.log(globalCasesByDate)
         cacheClient.setex(
           `globalCasesByDate-${args.day}`,
           CACHE_TTL,

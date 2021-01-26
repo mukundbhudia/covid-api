@@ -16,9 +16,18 @@ const schema = buildSchema(`
     longitude: String
     province: String
     recovered: Int!
+    dateOfFirstCase: String
+    dateOfFirstDeath: String
+    highestDailyConfirmed: HighestCase
+    highestDailyDeaths: HighestCase
     casesByDate: [timeSeriesCases]
     provincesList: [Province]
     hasProvince: Boolean
+  }
+
+  type HighestCase {
+    count: Int
+    date: String
   }
 
   type Province {
@@ -33,6 +42,10 @@ const schema = buildSchema(`
     active: Int!
     confirmedCasesToday: Int!
     deathsToday: Int!
+    dateOfFirstCase: String
+    dateOfFirstDeath: String
+    highestDailyConfirmed: HighestCase
+    highestDailyDeaths: HighestCase
     day: String
   }
 

@@ -4,13 +4,15 @@ const { buildSchema } = require('graphql')
 const schema = buildSchema(`
   type CasesByLocation {
     idKey: String!
-    countryCode: String
+    countryCode: String!
     active: Int
     confirmed: Int!
     country: String!
     deaths: Int!
     confirmedCasesToday: Int!
     deathsToday: Int!
+    confirmedPerCapita: Float,
+    deathsPerCapita: Float,
     lastUpdate: String!
     latitude: String
     longitude: String
@@ -23,6 +25,16 @@ const schema = buildSchema(`
     casesByDate: [timeSeriesCases]
     provincesList: [Province]
     hasProvince: Boolean
+    continent: String
+    populationDensity: Float
+    medianAge: Float
+    aged65older: Float
+    aged70older: Float
+    gdpPerCapita: Float
+    diabetesPrevalence: Float
+    cardiovascDeathRate: Float
+    lifeExpectancy: Float
+    humanDevelopmentIndex: Float
   }
 
   type HighestCase {
@@ -42,6 +54,9 @@ const schema = buildSchema(`
     active: Int!
     confirmedCasesToday: Int!
     deathsToday: Int!
+    confirmedPerCapita: Float!,
+    deathsPerCapita: Float!,
+    globalPopulation: Float!,
     dateOfFirstCase: String
     dateOfFirstDeath: String
     highestDailyConfirmed: HighestCase

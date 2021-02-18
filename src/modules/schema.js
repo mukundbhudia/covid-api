@@ -14,8 +14,8 @@ const schema = buildSchema(`
     confirmedPerCapita: Float,
     deathsPerCapita: Float,
     lastUpdate: String!
-    latitude: String
-    longitude: String
+    latitude: Float
+    longitude: Float
     province: String
     recovered: Int!
     dateOfFirstCase: String

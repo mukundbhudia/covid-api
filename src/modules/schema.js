@@ -26,6 +26,7 @@ const schema = buildSchema(`
     provincesList: [Province]
     hasProvince: Boolean
     continent: String
+    population: Int
     populationDensity: Float
     medianAge: Float
     aged65older: Float
@@ -35,6 +36,15 @@ const schema = buildSchema(`
     cardiovascDeathRate: Float
     lifeExpectancy: Float
     humanDevelopmentIndex: Float
+    totalTests: Int,
+    totalTestsPerThousand: Float,
+    totalVaccinations: Int,
+    peopleVaccinated: Int,
+    peopleFullyVaccinated: Int,
+    totalVaccinationsPerHundred: Float,
+    peopleVaccinatedPerHundred: Float,
+    peopleFullyVaccinatedPerHundred: Float,
+    extremePoverty: Float,
   }
 
   type HighestCase {
@@ -56,12 +66,30 @@ const schema = buildSchema(`
     deathsToday: Int!
     confirmedPerCapita: Float!,
     deathsPerCapita: Float!,
-    globalPopulation: Float!,
     dateOfFirstCase: String
     dateOfFirstDeath: String
     highestDailyConfirmed: HighestCase
     highestDailyDeaths: HighestCase
-    day: String
+    globalPopulation: Float!
+    populationDensity: Float
+    medianAge: Float
+    aged65older: Float
+    aged70older: Float
+    gdpPerCapita: Float
+    diabetesPrevalence: Float
+    cardiovascDeathRate: Float
+    lifeExpectancy: Float
+    humanDevelopmentIndex: Float
+    totalTests: Int,
+    totalTestsPerThousand: Float,
+    totalVaccinations: Int,
+    peopleVaccinated: Int,
+    peopleFullyVaccinated: Int,
+    totalVaccinationsPerHundred: Float,
+    peopleVaccinatedPerHundred: Float,
+    peopleFullyVaccinatedPerHundred: Float,
+    extremePoverty: Float,
+    timeStamp: String
   }
 
   type timeSeriesCases {

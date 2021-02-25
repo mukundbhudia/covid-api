@@ -44,7 +44,13 @@ const schema = buildSchema(`
     totalVaccinationsPerHundred: Float,
     peopleVaccinatedPerHundred: Float,
     peopleFullyVaccinatedPerHundred: Float,
+    reproductionRate: Float,
+    positiveRate: Float,
     extremePoverty: Float,
+    femaleSmokers: Float,
+    maleSmokers: Float,
+    handwashingFacilities: Float,
+    hospitalBedsPerThousand: Float,
   }
 
   type HighestCase {
@@ -88,7 +94,13 @@ const schema = buildSchema(`
     totalVaccinationsPerHundred: Float,
     peopleVaccinatedPerHundred: Float,
     peopleFullyVaccinatedPerHundred: Float,
+    reproductionRate: Float,
+    positiveRate: Float,
     extremePoverty: Float,
+    femaleSmokers: Float,
+    maleSmokers: Float,
+    handwashingFacilities: Float,
+    hospitalBedsPerThousand: Float,
     timeStamp: String
   }
 

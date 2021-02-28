@@ -76,7 +76,7 @@ const schema = buildSchema(`
     dateOfFirstDeath: String
     highestDailyConfirmed: HighestCase
     highestDailyDeaths: HighestCase
-    globalPopulation: Float!
+    population: Float!
     populationDensity: Float
     medianAge: Float
     aged65older: Float

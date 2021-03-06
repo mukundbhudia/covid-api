@@ -11,8 +11,8 @@ const schema = buildSchema(`
     deaths: Int!
     confirmedCasesToday: Int!
     deathsToday: Int!
-    confirmedPerCapita: Float,
-    deathsPerCapita: Float,
+    confirmedPerCapita: Float
+    deathsPerCapita: Float
     lastUpdate: String!
     latitude: Float
     longitude: Float
@@ -36,21 +36,21 @@ const schema = buildSchema(`
     cardiovascDeathRate: Float
     lifeExpectancy: Float
     humanDevelopmentIndex: Float
-    totalTests: Int,
-    totalTestsPerThousand: Float,
-    totalVaccinations: Int,
-    peopleVaccinated: Int,
-    peopleFullyVaccinated: Int,
-    totalVaccinationsPerHundred: Float,
-    peopleVaccinatedPerHundred: Float,
-    peopleFullyVaccinatedPerHundred: Float,
-    reproductionRate: Float,
-    positiveRate: Float,
-    extremePoverty: Float,
-    femaleSmokers: Float,
-    maleSmokers: Float,
-    handwashingFacilities: Float,
-    hospitalBedsPerThousand: Float,
+    totalTests: Int
+    totalTestsPerThousand: Float
+    totalVaccinations: Int
+    peopleVaccinated: Int
+    peopleFullyVaccinated: Int
+    totalVaccinationsPerHundred: Float
+    peopleVaccinatedPerHundred: Float
+    peopleFullyVaccinatedPerHundred: Float
+    reproductionRate: Float
+    positiveRate: Float
+    extremePoverty: Float
+    femaleSmokers: Float
+    maleSmokers: Float
+    handwashingFacilities: Float
+    hospitalBedsPerThousand: Float
   }
 
   type HighestCase {
@@ -70,8 +70,8 @@ const schema = buildSchema(`
     active: Int!
     confirmedCasesToday: Int!
     deathsToday: Int!
-    confirmedPerCapita: Float!,
-    deathsPerCapita: Float!,
+    confirmedPerCapita: Float!
+    deathsPerCapita: Float!
     dateOfFirstCase: String
     dateOfFirstDeath: String
     highestDailyConfirmed: HighestCase
@@ -86,21 +86,21 @@ const schema = buildSchema(`
     cardiovascDeathRate: Float
     lifeExpectancy: Float
     humanDevelopmentIndex: Float
-    totalTests: Int,
-    totalTestsPerThousand: Float,
-    totalVaccinations: Int,
-    peopleVaccinated: Int,
-    peopleFullyVaccinated: Int,
-    totalVaccinationsPerHundred: Float,
-    peopleVaccinatedPerHundred: Float,
-    peopleFullyVaccinatedPerHundred: Float,
-    reproductionRate: Float,
-    positiveRate: Float,
-    extremePoverty: Float,
-    femaleSmokers: Float,
-    maleSmokers: Float,
-    handwashingFacilities: Float,
-    hospitalBedsPerThousand: Float,
+    totalTests: Int
+    totalTestsPerThousand: Float
+    totalVaccinations: Int
+    peopleVaccinated: Int
+    peopleFullyVaccinated: Int
+    totalVaccinationsPerHundred: Float
+    peopleVaccinatedPerHundred: Float
+    peopleFullyVaccinatedPerHundred: Float
+    reproductionRate: Float
+    positiveRate: Float
+    extremePoverty: Float
+    femaleSmokers: Float
+    maleSmokers: Float
+    handwashingFacilities: Float
+    hospitalBedsPerThousand: Float
     timeStamp: String
   }
 

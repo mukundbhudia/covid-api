@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "engines": {
     "node": "14.x.x",
-    "npm": "6.x.x"
+    "npm": "7.x.x"
   },
   "scripts": {
     "start": "node ./src/server.js",
@@ -30,7 +30,7 @@
     "express-graphql": "^0.12.0",
     "graphql": "^15.5.0",
     "mongodb": "^3.6.5",
-    "redis": "^3.0.2",
+    "redis": "^3.1.0",
     "winston": "^3.3.3"
   },
   "devDependencies": {

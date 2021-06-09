@@ -2,8 +2,8 @@ const { logger } = require('../modules/logger')
 const { getDBClient, connectCache } = require('./dbClient')
 const { cacheClient, getAsync } = connectCache()
 
-const CACHE_TTL_IN_MINS = process.env.CACHE_TTL_IN_MINS || 10   // Time in minutes key lives in cache
-const CACHE_TTL = CACHE_TTL_IN_MINS * 60                        // Time in seconds key lives in cache
+const CACHE_TTL_IN_MINS = process.env.CACHE_TTL_IN_MINS || 10 // Time in minutes key lives in cache
+const CACHE_TTL = CACHE_TTL_IN_MINS * 60 // Time in seconds key lives in cache
 const TOTALS_COLLECTION = 'totals'
 const CASES_BY_LOCATION_COLLECTION = 'casesByLocation'
 

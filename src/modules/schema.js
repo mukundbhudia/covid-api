@@ -26,7 +26,7 @@ const schema = buildSchema(`
     provincesList: [Province]
     hasProvince: Boolean
     continent: String
-    population: Int
+    population: Float
     populationDensity: Float
     medianAge: Float
     aged65older: Float
@@ -36,11 +36,11 @@ const schema = buildSchema(`
     cardiovascDeathRate: Float
     lifeExpectancy: Float
     humanDevelopmentIndex: Float
-    totalTests: Int
+    totalTests: Float
     totalTestsPerThousand: Float
-    totalVaccinations: Int
-    peopleVaccinated: Int
-    peopleFullyVaccinated: Int
+    totalVaccinations: Float
+    peopleVaccinated: Float
+    peopleFullyVaccinated: Float
     totalVaccinationsPerHundred: Float
     peopleVaccinatedPerHundred: Float
     peopleFullyVaccinatedPerHundred: Float
@@ -86,11 +86,11 @@ const schema = buildSchema(`
     cardiovascDeathRate: Float
     lifeExpectancy: Float
     humanDevelopmentIndex: Float
-    totalTests: Int
+    totalTests: Float
     totalTestsPerThousand: Float
-    totalVaccinations: Int
-    peopleVaccinated: Int
-    peopleFullyVaccinated: Int
+    totalVaccinations: Float
+    peopleVaccinated: Float
+    peopleFullyVaccinated: Float
     totalVaccinationsPerHundred: Float
     peopleVaccinatedPerHundred: Float
     peopleFullyVaccinatedPerHundred: Float

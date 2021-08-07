@@ -4,7 +4,7 @@ This project works in conjunction with [covid-web](https://github.com/mukundbhud
 
 ## Demo
 
-A working demo of his API is avaiable at https://covid19-dash-api.herokuapp.com/. Use the [GraphiQL web interface](https://covid19-dash-api.herokuapp.com/graphql) to explore the data structure and perform queries.
+A working demo of his API is avaiable at https://covid19-dash-api2.herokuapp.com/. Use the [GraphiQL web interface](https://covid19-dash-api2.herokuapp.com/graphql) to explore the data structure and perform queries.
 
 ## Prerequisites
 * Node v14.x.x

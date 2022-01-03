@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb')
-const redis = require("redis")
-const { promisify } = require("util")
+const redis = require('redis')
+const { promisify } = require('util')
 
 let client
 const DB_NAME = process.env.MONGO_DB || 'covid19'
@@ -21,11 +21,11 @@ const connectCache = () => {
   const REDIS_URL = process.env.REDIS_URL || 6379
   try {
     cacheClient = redis.createClient(REDIS_URL)
-    cacheClient.on("error", (error) => {
+    cacheClient.on('error', (error) => {
       console.error(error)
     })
-    const getAsync = promisify(cacheClient.get).bind(cacheClient);
-    return { cacheClient, getAsync }
+    cacheClient.connect()
+    return { cacheClient }
   } catch (error) {
     console.error(error)
     logger.error(error)

@@ -1,6 +1,6 @@
 const { logger } = require('../modules/logger')
 const { getDBClient, connectCache } = require('./dbClient')
-const { cacheClient, getAsync } = connectCache()
+const { cacheClient } = connectCache()
 
 const CACHE_TTL_IN_MINS = process.env.CACHE_TTL_IN_MINS || 10 // Time in minutes key lives in cache
 const CACHE_TTL = CACHE_TTL_IN_MINS * 60 // Time in seconds key lives in cache
@@ -11,7 +11,7 @@ const CASES_BY_LOCATION_COLLECTION = 'casesByLocation'
 const root = {
   globalTimeSeries: async () => {
     const dbClient = await getDBClient()
-    const cachedGlobalTimeSeries = await getAsync(`globalTimeSeries`)
+    const cachedGlobalTimeSeries = await cacheClient.get(`globalTimeSeries`)
 
     let timeSeriesTotalCasesByDate = null
 
@@ -21,10 +21,10 @@ const root = {
     } else {
       let result = await dbClient.collection(TOTALS_COLLECTION).findOne()
       timeSeriesTotalCasesByDate = result.timeSeriesTotalCasesByDate
-      cacheClient.setex(
+      cacheClient.set(
         `globalTimeSeries`,
-        CACHE_TTL,
-        JSON.stringify(timeSeriesTotalCasesByDate)
+        JSON.stringify(timeSeriesTotalCasesByDate),
+        { ex: CACHE_TTL }
       )
       logger.debug('globalTimeSeries from db')
     }
@@ -45,7 +45,7 @@ const root = {
   },
   getAllDaysWithCases: async () => {
     const dbClient = await getDBClient()
-    const cachedAllDaysWithCases = await getAsync(`allDaysWithCases`)
+    const cachedAllDaysWithCases = await cacheClient.get(`allDaysWithCases`)
 
     let allDaysWithCases = null
 
@@ -57,11 +57,9 @@ const root = {
       allDaysWithCases = result.globalCasesByDate.map((cases) => {
         return cases.day
       })
-      cacheClient.setex(
-        `allDaysWithCases`,
-        CACHE_TTL,
-        JSON.stringify(allDaysWithCases)
-      )
+      cacheClient.set(`allDaysWithCases`, JSON.stringify(allDaysWithCases), {
+        ex: CACHE_TTL,
+      })
       logger.debug('allDaysWithCases from db')
     }
     logger.debug(
@@ -73,7 +71,7 @@ const root = {
   getGlobalCasesByDate: async (args) => {
     if (args && args.day) {
       const dbClient = await getDBClient()
-      const cachedGlobalCasesByDate = await getAsync(
+      const cachedGlobalCasesByDate = await cacheClient.get(
         `globalCasesByDate-${args.day}`
       )
 
@@ -90,10 +88,10 @@ const root = {
         if (foundCases && foundCases.length > 0) {
           globalCasesByDate = foundCases[0].casesOfTheDay
         }
-        cacheClient.setex(
+        cacheClient.set(
           `globalCasesByDate-${args.day}`,
-          CACHE_TTL,
-          JSON.stringify(globalCasesByDate)
+          JSON.stringify(globalCasesByDate),
+          { ex: CACHE_TTL }
         )
         logger.debug('globalCasesByDate from db')
       }
@@ -106,7 +104,9 @@ const root = {
   getCasesByIdKey: async (args) => {
     if (args && args.idKey) {
       const dbClient = await getDBClient()
-      const cachedCasesByIdKey = await getAsync(`casesByIdKey-${args.idKey}`)
+      const cachedCasesByIdKey = await cacheClient.get(
+        `casesByIdKey-${args.idKey}`
+      )
 
       let casesByIdKey = null
 
@@ -118,10 +118,10 @@ const root = {
           .collection(CASES_BY_LOCATION_COLLECTION)
           .find({ idKey: args.idKey })
           .toArray()
-        cacheClient.setex(
+        cacheClient.set(
           `casesByIdKey-${args.idKey}`,
-          CACHE_TTL,
-          JSON.stringify(casesByIdKey)
+          JSON.stringify(casesByIdKey),
+          { ex: CACHE_TTL }
         )
         logger.debug('casesByIdKey from db')
       }
@@ -135,7 +135,7 @@ const root = {
     if (args && args.idKeys) {
       const dbClient = await getDBClient()
       const idKeysAsStrings = args.idKeys.join(':')
-      const cachedManyCasesByIdKey = await getAsync(
+      const cachedManyCasesByIdKey = await cacheClient.get(
         `manyCasesByIdKey-${idKeysAsStrings}`
       )
 
@@ -149,10 +149,10 @@ const root = {
           .collection(CASES_BY_LOCATION_COLLECTION)
           .find({ idKey: { $in: args.idKeys } })
           .toArray()
-        cacheClient.setex(
+        cacheClient.set(
           `manyCasesByIdKey-${idKeysAsStrings}`,
-          CACHE_TTL,
-          JSON.stringify(manyCasesByIdKey)
+          JSON.stringify(manyCasesByIdKey),
+          { ex: CACHE_TTL }
         )
         logger.debug('manyCasesByIdKey from db')
       }
@@ -198,7 +198,7 @@ const root = {
     if (args && args.country) {
       const dbClient = await getDBClient()
 
-      const cachedProvincesGivenCountryName = await getAsync(
+      const cachedProvincesGivenCountryName = await cacheClient.get(
         `provincesGivenCountryName-${args.country}`
       )
 
@@ -213,10 +213,10 @@ const root = {
           .find({ hasProvince: false, country: args.country })
           .sort({ confirmed: -1 })
           .toArray()
-        cacheClient.setex(
+        cacheClient.set(
           `provincesGivenCountryName-${args.country}`,
-          CACHE_TTL,
-          JSON.stringify(provincesGivenCountryName)
+          JSON.stringify(provincesGivenCountryName),
+          { ex: CACHE_TTL }
         )
         logger.debug('provincesGivenCountryName from db')
       }
@@ -229,7 +229,9 @@ const root = {
   topXconfirmedByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const cachedTopX = await getAsync(`topXconfirmedByCountry-${args.limit}`)
+      const cachedTopX = await cacheClient.get(
+        `topXconfirmedByCountry-${args.limit}`
+      )
 
       let topXconfirmedByCountry = null
 
@@ -243,10 +245,10 @@ const root = {
           .sort({ confirmed: -1 })
           .limit(args.limit)
           .toArray()
-        cacheClient.setex(
+        cacheClient.set(
           `topXconfirmedByCountry-${args.limit}`,
-          CACHE_TTL,
-          JSON.stringify(topXconfirmedByCountry)
+          JSON.stringify(topXconfirmedByCountry),
+          { ex: CACHE_TTL }
         )
         logger.debug('topXconfirmedByCountry from db')
       }
@@ -259,7 +261,9 @@ const root = {
   topXactiveByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const cachedTopX = await getAsync(`topXactiveByCountry-${args.limit}`)
+      const cachedTopX = await cacheClient.get(
+        `topXactiveByCountry-${args.limit}`
+      )
 
       let topXactiveByCountry = null
 
@@ -273,10 +277,10 @@ const root = {
           .sort({ active: -1 })
           .limit(args.limit)
           .toArray()
-        cacheClient.setex(
+        cacheClient.set(
           `topXactiveByCountry-${args.limit}`,
-          CACHE_TTL,
-          JSON.stringify(topXactiveByCountry)
+          JSON.stringify(topXactiveByCountry),
+          { ex: CACHE_TTL }
         )
         logger.debug('topXactiveByCountry from db')
       }
@@ -289,7 +293,9 @@ const root = {
   topXrecoveredByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const cachedTopX = await getAsync(`topXrecoveredByCountry-${args.limit}`)
+      const cachedTopX = await cacheClient.get(
+        `topXrecoveredByCountry-${args.limit}`
+      )
 
       let topXrecoveredByCountry = null
 
@@ -303,10 +309,10 @@ const root = {
           .sort({ recovered: -1 })
           .limit(args.limit)
           .toArray()
-        cacheClient.setex(
+        cacheClient.set(
           `topXrecoveredByCountry-${args.limit}`,
-          CACHE_TTL,
-          JSON.stringify(topXrecoveredByCountry)
+          JSON.stringify(topXrecoveredByCountry),
+          { ex: CACHE_TTL }
         )
         logger.debug('topXrecoveredByCountry from db')
       }
@@ -319,7 +325,9 @@ const root = {
   topXdeathsByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const cachedTopX = await getAsync(`topXdeathsByCountry-${args.limit}`)
+      const cachedTopX = await cacheClient.get(
+        `topXdeathsByCountry-${args.limit}`
+      )
 
       let topXdeathsByCountry = null
 
@@ -333,10 +341,10 @@ const root = {
           .sort({ deaths: -1 })
           .limit(args.limit)
           .toArray()
-        cacheClient.setex(
+        cacheClient.set(
           `topXdeathsByCountry-${args.limit}`,
-          CACHE_TTL,
-          JSON.stringify(topXdeathsByCountry)
+          JSON.stringify(topXdeathsByCountry),
+          { ex: CACHE_TTL }
         )
         logger.debug('topXdeathsByCountry from db')
       }
@@ -349,7 +357,7 @@ const root = {
   topXconfirmedTodayByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const cachedTopX = await getAsync(
+      const cachedTopX = await cacheClient.get(
         `topXconfirmedTodayByCountry-${args.limit}`
       )
 
@@ -365,10 +373,10 @@ const root = {
           .sort({ confirmedCasesToday: -1 })
           .limit(args.limit)
           .toArray()
-        cacheClient.setex(
+        cacheClient.set(
           `topXconfirmedTodayByCountry-${args.limit}`,
-          CACHE_TTL,
-          JSON.stringify(topXconfirmedTodayByCountry)
+          JSON.stringify(topXconfirmedTodayByCountry),
+          { ex: CACHE_TTL }
         )
         logger.debug('topXconfirmedTodayByCountry from db')
       }
@@ -381,7 +389,7 @@ const root = {
   topXdeathsTodayByCountry: async (args) => {
     if (args && args.limit) {
       const dbClient = await getDBClient()
-      const cachedTopX = await getAsync(
+      const cachedTopX = await cacheClient.get(
         `topXdeathsTodayByCountry-${args.limit}`
       )
 
@@ -397,10 +405,10 @@ const root = {
           .sort({ deathsToday: -1 })
           .limit(args.limit)
           .toArray()
-        cacheClient.setex(
+        cacheClient.set(
           `topXdeathsTodayByCountry-${args.limit}`,
-          CACHE_TTL,
-          JSON.stringify(topXdeathsTodayByCountry)
+          JSON.stringify(topXdeathsTodayByCountry),
+          { ex: CACHE_TTL }
         )
         logger.debug('topXdeathsTodayByCountry from db')
       }
@@ -412,7 +420,7 @@ const root = {
   },
   lastUpdated: async () => {
     const dbClient = await getDBClient()
-    const cachedLastUpdated = await getAsync('lastUpdated')
+    const cachedLastUpdated = await cacheClient.get('lastUpdated')
     let timeStamp = null
     if (cachedLastUpdated) {
       timeStamp = JSON.parse(cachedLastUpdated)
@@ -420,11 +428,9 @@ const root = {
     } else {
       let dbResult = await dbClient.collection(TOTALS_COLLECTION).findOne()
       timeStamp = dbResult.timeStamp
-      cacheClient.setex(
-        'lastUpdated',
-        CACHE_TTL,
-        JSON.stringify(timeStamp.getTime())
-      )
+      cacheClient.set('lastUpdated', JSON.stringify(timeStamp.getTime()), {
+        ex: CACHE_TTL,
+      })
       logger.debug('lastUpdated from db')
     }
     logger.debug(
@@ -434,7 +440,7 @@ const root = {
   },
   casesByLocation: async () => {
     const dbClient = await getDBClient()
-    const cachedCasesByLocation = await getAsync('casesByLocation')
+    const cachedCasesByLocation = await cacheClient.get('casesByLocation')
 
     let casesByLocation = null
 
@@ -447,11 +453,9 @@ const root = {
         .find({})
         .sort({ province: 1 })
         .toArray()
-      cacheClient.setex(
-        'casesByLocation',
-        CACHE_TTL,
-        JSON.stringify(casesByLocation)
-      )
+      cacheClient.set('casesByLocation', JSON.stringify(casesByLocation), {
+        ex: CACHE_TTL,
+      })
       logger.debug('casesByLocation from db')
     }
     logger.debug(
@@ -461,7 +465,7 @@ const root = {
   },
   casesByLocationWithNoProvince: async () => {
     const dbClient = await getDBClient()
-    const cachedCases = await getAsync('casesByLocationWithNoProvince')
+    const cachedCases = await cacheClient.get('casesByLocationWithNoProvince')
 
     let casesByLocationWithNoProvince = null
 
@@ -475,10 +479,10 @@ const root = {
         .find({ $or: [{ province: null }, { province: 'Greenland' }] })
         .sort({ country: 1 })
         .toArray()
-      cacheClient.setex(
+      cacheClient.set(
         'casesByLocationWithNoProvince',
-        CACHE_TTL,
-        JSON.stringify(casesByLocationWithNoProvince)
+        JSON.stringify(casesByLocationWithNoProvince),
+        { ex: CACHE_TTL }
       )
       logger.debug('casesByLocationWithNoProvince from db')
     }
@@ -490,7 +494,7 @@ const root = {
   },
   totalCases: async () => {
     const dbClient = await getDBClient()
-    const cachedTotalCases = await getAsync('totalCases')
+    const cachedTotalCases = await cacheClient.get('totalCases')
 
     let totalCases = null
 
@@ -499,7 +503,9 @@ const root = {
       logger.debug('totalCases from cache')
     } else {
       totalCases = await dbClient.collection(TOTALS_COLLECTION).findOne()
-      cacheClient.setex('totalCases', CACHE_TTL, JSON.stringify(totalCases))
+      cacheClient.set('totalCases', JSON.stringify(totalCases), {
+        ex: CACHE_TTL,
+      })
       logger.debug('totalCases from db')
     }
     logger.debug(`Resolver 'totalCases'`)

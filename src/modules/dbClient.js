@@ -18,9 +18,11 @@ const connectDB = async () => {
 }
 
 const connectCache = () => {
-  const REDIS_URL = process.env.REDIS_URL || 6379
+  const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379'
   try {
-    cacheClient = redis.createClient(REDIS_URL)
+    cacheClient = redis.createClient({
+      url: REDIS_URL
+    })
     cacheClient.on('error', (error) => {
       console.error(error)
     })

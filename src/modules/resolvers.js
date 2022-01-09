@@ -24,7 +24,7 @@ const root = {
       cacheClient.set(
         `globalTimeSeries`,
         JSON.stringify(timeSeriesTotalCasesByDate),
-        { ex: CACHE_TTL }
+        { EX: CACHE_TTL }
       )
       logger.debug('globalTimeSeries from db')
     }
@@ -58,7 +58,7 @@ const root = {
         return cases.day
       })
       cacheClient.set(`allDaysWithCases`, JSON.stringify(allDaysWithCases), {
-        ex: CACHE_TTL,
+        EX: CACHE_TTL,
       })
       logger.debug('allDaysWithCases from db')
     }
@@ -91,7 +91,7 @@ const root = {
         cacheClient.set(
           `globalCasesByDate-${args.day}`,
           JSON.stringify(globalCasesByDate),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('globalCasesByDate from db')
       }
@@ -121,7 +121,7 @@ const root = {
         cacheClient.set(
           `casesByIdKey-${args.idKey}`,
           JSON.stringify(casesByIdKey),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('casesByIdKey from db')
       }
@@ -152,7 +152,7 @@ const root = {
         cacheClient.set(
           `manyCasesByIdKey-${idKeysAsStrings}`,
           JSON.stringify(manyCasesByIdKey),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('manyCasesByIdKey from db')
       }
@@ -216,7 +216,7 @@ const root = {
         cacheClient.set(
           `provincesGivenCountryName-${args.country}`,
           JSON.stringify(provincesGivenCountryName),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('provincesGivenCountryName from db')
       }
@@ -248,7 +248,7 @@ const root = {
         cacheClient.set(
           `topXconfirmedByCountry-${args.limit}`,
           JSON.stringify(topXconfirmedByCountry),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('topXconfirmedByCountry from db')
       }
@@ -280,7 +280,7 @@ const root = {
         cacheClient.set(
           `topXactiveByCountry-${args.limit}`,
           JSON.stringify(topXactiveByCountry),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('topXactiveByCountry from db')
       }
@@ -312,7 +312,7 @@ const root = {
         cacheClient.set(
           `topXrecoveredByCountry-${args.limit}`,
           JSON.stringify(topXrecoveredByCountry),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('topXrecoveredByCountry from db')
       }
@@ -344,7 +344,7 @@ const root = {
         cacheClient.set(
           `topXdeathsByCountry-${args.limit}`,
           JSON.stringify(topXdeathsByCountry),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('topXdeathsByCountry from db')
       }
@@ -376,7 +376,7 @@ const root = {
         cacheClient.set(
           `topXconfirmedTodayByCountry-${args.limit}`,
           JSON.stringify(topXconfirmedTodayByCountry),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('topXconfirmedTodayByCountry from db')
       }
@@ -408,7 +408,7 @@ const root = {
         cacheClient.set(
           `topXdeathsTodayByCountry-${args.limit}`,
           JSON.stringify(topXdeathsTodayByCountry),
-          { ex: CACHE_TTL }
+          { EX: CACHE_TTL }
         )
         logger.debug('topXdeathsTodayByCountry from db')
       }
@@ -429,7 +429,7 @@ const root = {
       let dbResult = await dbClient.collection(TOTALS_COLLECTION).findOne()
       timeStamp = dbResult.timeStamp
       cacheClient.set('lastUpdated', JSON.stringify(timeStamp.getTime()), {
-        ex: CACHE_TTL,
+        EX: CACHE_TTL,
       })
       logger.debug('lastUpdated from db')
     }
@@ -454,7 +454,7 @@ const root = {
         .sort({ province: 1 })
         .toArray()
       cacheClient.set('casesByLocation', JSON.stringify(casesByLocation), {
-        ex: CACHE_TTL,
+        EX: CACHE_TTL,
       })
       logger.debug('casesByLocation from db')
     }
@@ -482,7 +482,7 @@ const root = {
       cacheClient.set(
         'casesByLocationWithNoProvince',
         JSON.stringify(casesByLocationWithNoProvince),
-        { ex: CACHE_TTL }
+        { EX: CACHE_TTL }
       )
       logger.debug('casesByLocationWithNoProvince from db')
     }
@@ -504,7 +504,7 @@ const root = {
     } else {
       totalCases = await dbClient.collection(TOTALS_COLLECTION).findOne()
       cacheClient.set('totalCases', JSON.stringify(totalCases), {
-        ex: CACHE_TTL,
+        EX: CACHE_TTL,
       })
       logger.debug('totalCases from db')
     }

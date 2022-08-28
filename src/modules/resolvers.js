@@ -7,6 +7,10 @@ const CACHE_TTL = CACHE_TTL_IN_MINS * 60 // Time in seconds key lives in cache
 const TOTALS_COLLECTION = 'totals'
 const CASES_BY_LOCATION_COLLECTION = 'casesByLocation'
 
+const findOptions = {
+  allowDiskUse: true,
+}
+
 // The root provides a resolver function for each API endpoint
 const root = {
   globalTimeSeries: async () => {
@@ -116,7 +120,7 @@ const root = {
       } else {
         casesByIdKey = await dbClient
           .collection(CASES_BY_LOCATION_COLLECTION)
-          .find({ idKey: args.idKey })
+          .find({ idKey: args.idKey }, findOptions)
           .toArray()
         cacheClient.set(
           `casesByIdKey-${args.idKey}`,
@@ -147,7 +151,7 @@ const root = {
       } else {
         manyCasesByIdKey = await dbClient
           .collection(CASES_BY_LOCATION_COLLECTION)
-          .find({ idKey: { $in: args.idKeys } })
+          .find({ idKey: { $in: args.idKeys } }, findOptions)
           .toArray()
         cacheClient.set(
           `manyCasesByIdKey-${idKeysAsStrings}`,
@@ -167,7 +171,7 @@ const root = {
       const dbClient = await getDBClient()
       const result = await dbClient
         .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ country: args.country })
+        .find({ country: args.country }, findOptions)
         .toArray()
       logger.debug(
         `Resolver 'getCasesWithCountry' with: ${result.length} cases for '${args.country}'`
@@ -183,10 +187,13 @@ const root = {
       const dbClient = await getDBClient()
       const result = await dbClient
         .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({
-          country: args.country,
-          province: args.province,
-        })
+        .find(
+          {
+            country: args.country,
+            province: args.province,
+          },
+          findOptions
+        )
         .toArray()
       logger.debug(
         `Resolver 'getCasesWithCountryAndProvince' with: ${result.length} cases for '${args.country}'`
@@ -210,7 +217,7 @@ const root = {
       } else {
         provincesGivenCountryName = await dbClient
           .collection(CASES_BY_LOCATION_COLLECTION)
-          .find({ hasProvince: false, country: args.country })
+          .find({ hasProvince: false, country: args.country }, findOptions)
           .sort({ confirmed: -1 })
           .toArray()
         cacheClient.set(
@@ -241,7 +248,7 @@ const root = {
       } else {
         topXconfirmedByCountry = await dbClient
           .collection(CASES_BY_LOCATION_COLLECTION)
-          .find({ province: null })
+          .find({ province: null }, findOptions)
           .sort({ confirmed: -1 })
           .limit(args.limit)
           .toArray()
@@ -273,7 +280,7 @@ const root = {
       } else {
         topXactiveByCountry = await dbClient
           .collection(CASES_BY_LOCATION_COLLECTION)
-          .find({ province: null })
+          .find({ province: null }, findOptions)
           .sort({ active: -1 })
           .limit(args.limit)
           .toArray()
@@ -305,7 +312,7 @@ const root = {
       } else {
         topXrecoveredByCountry = await dbClient
           .collection(CASES_BY_LOCATION_COLLECTION)
-          .find({ province: null })
+          .find({ province: null }, findOptions)
           .sort({ recovered: -1 })
           .limit(args.limit)
           .toArray()
@@ -337,7 +344,7 @@ const root = {
       } else {
         topXdeathsByCountry = await dbClient
           .collection(CASES_BY_LOCATION_COLLECTION)
-          .find({ province: null })
+          .find({ province: null }, findOptions)
           .sort({ deaths: -1 })
           .limit(args.limit)
           .toArray()
@@ -369,7 +376,7 @@ const root = {
       } else {
         topXconfirmedTodayByCountry = await dbClient
           .collection(CASES_BY_LOCATION_COLLECTION)
-          .find({ province: null })
+          .find({ province: null }, findOptions)
           .sort({ confirmedCasesToday: -1 })
           .limit(args.limit)
           .toArray()
@@ -401,7 +408,7 @@ const root = {
       } else {
         topXdeathsTodayByCountry = await dbClient
           .collection(CASES_BY_LOCATION_COLLECTION)
-          .find({ province: null })
+          .find({ province: null }, findOptions)
           .sort({ deathsToday: -1 })
           .limit(args.limit)
           .toArray()
@@ -450,7 +457,7 @@ const root = {
     } else {
       casesByLocation = await dbClient
         .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({})
+        .find({}, findOptions)
         .sort({ province: 1 })
         .toArray()
       cacheClient.set('casesByLocation', JSON.stringify(casesByLocation), {
@@ -476,7 +483,10 @@ const root = {
       // We make an exception for Greenland as some datasets consider it to be it's on country
       casesByLocationWithNoProvince = await dbClient
         .collection(CASES_BY_LOCATION_COLLECTION)
-        .find({ $or: [{ province: null }, { province: 'Greenland' }] })
+        .find(
+          { $or: [{ province: null }, { province: 'Greenland' }] },
+          findOptions
+        )
         .sort({ country: 1 })
         .toArray()
       cacheClient.set(

@@ -23,11 +23,27 @@ const startServer = async () => {
         graphiql: true,
       })
     )
+    .get('/healthz', function (_req, res) {
+      console.log('/healthz request called')
+      res.json({ status: 'OK' })
+    })
     .listen(SERVER_PORT)
+
+  const envs = {
+    instanceEnv: process.env.NODE_ENV,
+    port: SERVER_PORT,
+    mongoUri: process.env.MONGO_URI,
+    mongoDbName: process.env.MONGO_DB,
+    redisUrl: process.env.REDIS_URL,
+    redisTlsUrl: process.env.REDIS_TLS_URL,
+    redisCacheTtlInMins: process.env.CACHE_TTL_IN_MINS,
+  }
 
   const welcomeMessage = `Running covid-api GQL server at http://localhost:${SERVER_PORT}/graphql in env: ${process.env.NODE_ENV}`
   console.log(welcomeMessage)
   logger.info(welcomeMessage)
+  console.log('Envs:', envs)
+  logger.info('Envs:', envs)
 }
 
 startServer()

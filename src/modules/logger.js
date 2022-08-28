@@ -1,10 +1,6 @@
 const winston = require('winston')
 
-let loggingLevel = 'info'
-
-if (process.env.NODE_ENV !== 'production') {
-  loggingLevel = 'debug'
-}
+let loggingLevel = process.env.LOG_LEVEL || 'info'
 
 const initLogger = () => {
   const logger = winston.createLogger({
@@ -17,7 +13,7 @@ const initLogger = () => {
       // winston.format.splat(),
       winston.format.json()
     ),
-    // defaultMeta: { service: 'air-quality-api' },
+    // defaultMeta: { service: 'covid-api' },
     transports: [
       //
       // - Write all logs with level `error` and below to `error.log`

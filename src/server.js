@@ -28,7 +28,7 @@ const startServer = async () => {
     })
     .listen(SERVER_PORT)
 
-  const mongoUri = process.env.MONGO_URI || ''
+  let mongoUri = process.env.MONGO_URI || ''
   if (mongoUri.length > 25) mongoUri = mongoUri.substring(0, 25)
 
   const envs = {

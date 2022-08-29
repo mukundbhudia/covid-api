@@ -1,6 +1,5 @@
 const { MongoClient } = require('mongodb')
 const redis = require('redis')
-const { promisify } = require('util')
 
 let client
 const DB_NAME = process.env.MONGO_DB || 'covid19'

@@ -29,14 +29,17 @@ const startServer = async () => {
     .listen(SERVER_PORT)
 
   let mongoUri = process.env.MONGO_URI || ''
-  if (mongoUri.length > 25) mongoUri = mongoUri.substring(0, 25)
+  if (mongoUri.length > 25) mongoUri = mongoUri.substring(0, 25) + '...'
+
+  let redisUri = process.env.REDIS_URL || ''
+  if (redisUri.length > 25) redisUri = redisUri.substring(0, 25) + '...'
 
   const envs = {
     instanceEnv: process.env.NODE_ENV,
     port: SERVER_PORT,
     mongoUri,
     mongoDbName: process.env.MONGO_DB,
-    redisUrl: process.env.REDIS_URL,
+    redisUri,
     redisTlsUrl: process.env.REDIS_TLS_URL,
     redisCacheTtlInMins: process.env.CACHE_TTL_IN_MINS,
   }
